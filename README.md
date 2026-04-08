@@ -75,9 +75,9 @@ The app uses the following access:
 
 ## Current Architecture
 
-- [SmsReceiver.kt](/Users/yuchen/Projects/auto-relay/app/src/main/java/com/autorelay/app/SmsReceiver.kt) processes SMS broadcasts from the telephony stack.
-- [MessageNotificationListenerService.kt](/Users/yuchen/Projects/auto-relay/app/src/main/java/com/autorelay/app/MessageNotificationListenerService.kt) processes Google Messages notifications for RCS fallback.
-- [MainActivity.kt](/Users/yuchen/Projects/auto-relay/app/src/main/java/com/autorelay/app/MainActivity.kt) manages SMS permission state and notification access status.
+- [SmsReceiver.kt](app/src/main/java/com/autorelay/app/SmsReceiver.kt) processes SMS broadcasts from the telephony stack.
+- [MessageNotificationListenerService.kt](app/src/main/java/com/autorelay/app/MessageNotificationListenerService.kt) processes Google Messages notifications for RCS fallback.
+- [MainActivity.kt](app/src/main/java/com/autorelay/app/MainActivity.kt) manages SMS permission state and notification access status.
 
 ## Roadmap
 

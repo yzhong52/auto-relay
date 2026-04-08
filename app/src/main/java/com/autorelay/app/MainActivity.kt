@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
     private fun hasNotificationListenerAccess(): Boolean {
         val enabledListeners = Settings.Secure.getString(
             contentResolver,
-            "enabled_notification_listeners"
+            Settings.Secure.ENABLED_NOTIFICATION_LISTENERS
         ) ?: return false
 
         val expectedComponent = ComponentName(this, MessageNotificationListenerService::class.java)
