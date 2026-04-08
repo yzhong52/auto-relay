@@ -2,6 +2,12 @@ package com.autorelay.app
 
 import android.content.Context
 
+fun resolveActions(context: Context, config: RelayConfig): List<String> = when {
+    !config.relayEnabled -> listOf(context.getString(R.string.action_relay_disabled))
+    config.destinationEmail.isBlank() -> listOf(context.getString(R.string.action_no_email))
+    else -> listOf(context.getString(R.string.action_forwarded, config.destinationEmail))
+}
+
 class RelayConfig(context: Context) {
     private val prefs = context.getSharedPreferences("relay_config", Context.MODE_PRIVATE)
 

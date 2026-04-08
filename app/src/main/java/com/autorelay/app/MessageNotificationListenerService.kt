@@ -52,10 +52,10 @@ class MessageNotificationListenerService : NotificationListenerService() {
         Log.i(TAG, "─────────────────────────────────────")
 
         val config = RelayConfig(this)
-        val actions = resolveActions(config)
+        val actions = resolveActions(this, config)
         RelayLog.add(
             sender = title.ifBlank { "Unknown" },
-            messagePreview = text.take(300),
+            message = text,
             source = LogEntry.Source.RCS,
             actions = actions
         )
@@ -73,9 +73,4 @@ class MessageNotificationListenerService : NotificationListenerService() {
             .orEmpty()
     }
 
-    private fun resolveActions(config: RelayConfig): List<String> = when {
-        !config.relayEnabled -> listOf("Relay disabled — message not forwarded")
-        config.destinationEmail.isBlank() -> listOf("No destination email configured")
-        else -> listOf("Forwarded to ${config.destinationEmail}")
-    }
 }

@@ -74,19 +74,14 @@ class SmsReceiver : BroadcastReceiver() {
             Log.i(TAG, "  Timestamp : $timestamp ($lastTimestamp ms)")
             Log.i(TAG, "─────────────────────────────────────")
 
-            val actions = resolveActions(config)
+            val actions = resolveActions(context, config)
             RelayLog.add(
                 sender = sender,
-                messagePreview = body.take(300),
+                message = body,
                 source = LogEntry.Source.SMS,
                 actions = actions
             )
         }
     }
 
-    private fun resolveActions(config: RelayConfig): List<String> = when {
-        !config.relayEnabled -> listOf("Relay disabled — message not forwarded")
-        config.destinationEmail.isBlank() -> listOf("No destination email configured")
-        else -> listOf("Forwarded to ${config.destinationEmail}")
-    }
 }

@@ -21,13 +21,14 @@ class LogAdapter : ListAdapter<LogEntry, LogAdapter.ViewHolder>(DiffCallback) {
         fun bind(entry: LogEntry) {
             binding.tvSender.text = entry.sender
             binding.tvTimestamp.text = formatTimestamp(entry.timestamp)
+            val ctx = binding.root.context
             binding.tvSource.text = when (entry.source) {
-                LogEntry.Source.SMS -> "via SMS"
-                LogEntry.Source.RCS -> "via RCS (Google Messages)"
+                LogEntry.Source.SMS -> ctx.getString(R.string.label_source_sms)
+                LogEntry.Source.RCS -> ctx.getString(R.string.label_source_rcs)
             }
-            binding.tvMessagePreview.text = entry.messagePreview
+            binding.tvMessagePreview.text = entry.message
             binding.tvActions.text = if (entry.actions.isEmpty()) {
-                "No actions"
+                ctx.getString(R.string.log_no_actions)
             } else {
                 entry.actions.joinToString("\n") { "→ $it" }
             }

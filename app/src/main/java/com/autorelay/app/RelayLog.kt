@@ -16,7 +16,7 @@ object RelayLog {
     @Synchronized
     fun add(
         sender: String,
-        messagePreview: String,
+        message: String,
         source: LogEntry.Source,
         actions: List<String>
     ) {
@@ -24,7 +24,7 @@ object RelayLog {
             id = nextId++,
             timestamp = System.currentTimeMillis(),
             sender = sender,
-            messagePreview = messagePreview,
+            message = message,
             source = source,
             actions = actions
         )

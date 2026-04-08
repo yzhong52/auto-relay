@@ -4,7 +4,7 @@ data class LogEntry(
     val id: Long,
     val timestamp: Long,
     val sender: String,
-    val messagePreview: String,
+    val message: String,
     val source: Source,
     val actions: List<String>
 ) {
