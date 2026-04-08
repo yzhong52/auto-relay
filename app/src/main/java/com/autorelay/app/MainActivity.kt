@@ -1,8 +1,11 @@
 package com.autorelay.app
 
 import android.Manifest
+import android.content.ComponentName
 import android.content.pm.PackageManager
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -43,18 +46,27 @@ class MainActivity : AppCompatActivity() {
         binding.btnGrantPermission.setOnClickListener {
             requestSmsPermissions()
         }
+        binding.btnNotificationAccess.setOnClickListener {
+            openNotificationAccessSettings()
+        }
 
         checkAndRequestPermissions()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateUi()
     }
 
     private fun checkAndRequestPermissions() {
         if (hasSmsPermissions()) {
             Log.i(TAG, "SMS permissions already granted")
-            onPermissionsGranted()
         } else {
             Log.i(TAG, "Requesting SMS permissions")
             requestSmsPermissions()
         }
+
+        updateUi()
     }
 
     private fun hasSmsPermissions(): Boolean {
@@ -68,15 +80,43 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onPermissionsGranted() {
-        binding.tvStatus.text = getString(R.string.status_running)
-        binding.btnGrantPermission.visibility = View.GONE
         Log.d(TAG, "AutoRelay is active and listening for SMS messages")
+        updateUi()
     }
 
     private fun onPermissionsDenied() {
-        binding.tvStatus.text = getString(R.string.permission_required)
-        binding.btnGrantPermission.visibility = View.VISIBLE
         Toast.makeText(this, getString(R.string.permission_required), Toast.LENGTH_LONG).show()
         Log.w(TAG, "AutoRelay cannot function without SMS permissions")
+        updateUi()
+    }
+
+    private fun updateUi() {
+        val hasSms = hasSmsPermissions()
+        val hasNotificationAccess = hasNotificationListenerAccess()
+
+        binding.tvStatus.text = getString(
+            R.string.status_summary,
+            if (hasSms) getString(R.string.status_enabled) else getString(R.string.status_missing),
+            if (hasNotificationAccess) getString(R.string.status_enabled) else getString(R.string.status_missing)
+        )
+
+        binding.btnGrantPermission.visibility = if (hasSms) View.GONE else View.VISIBLE
+        binding.btnNotificationAccess.visibility = if (hasNotificationAccess) View.GONE else View.VISIBLE
+    }
+
+    private fun hasNotificationListenerAccess(): Boolean {
+        val enabledListeners = Settings.Secure.getString(
+            contentResolver,
+            "enabled_notification_listeners"
+        ) ?: return false
+
+        val expectedComponent = ComponentName(this, MessageNotificationListenerService::class.java)
+            .flattenToString()
+
+        return enabledListeners.split(':').any { it.equals(expectedComponent, ignoreCase = true) }
+    }
+
+    private fun openNotificationAccessSettings() {
+        startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
     }
 }

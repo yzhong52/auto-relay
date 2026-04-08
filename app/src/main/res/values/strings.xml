@@ -2,6 +2,14 @@
 <resources>
     <string name="app_name">Auto Relay</string>
     <string name="status_running">Auto Relay is running.\nListening for incoming SMS messages.</string>
+    <string name="status_summary">Auto Relay is running.
+
+SMS receiver: %1$s
+Google Messages notification access: %2$s</string>
+    <string name="status_enabled">enabled</string>
+    <string name="status_missing">missing</string>
     <string name="permission_required">SMS permission is required for Auto Relay to work.</string>
     <string name="grant_permission">Grant Permission</string>
+    <string name="grant_notification_access">Grant Notification Access</string>
+    <string name="notification_listener_label">Auto Relay message listener</string>
 </resources>
