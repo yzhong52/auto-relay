@@ -10,19 +10,10 @@ An Android app that listens to incoming messages and forwards them to another nu
 - Requests SMS permissions at runtime
 - Guides the user to grant notification access for the RCS fallback
 
-## Why There Are Two Message Paths
+## FAQ
 
-Android does not expose one single API that covers both SMS and RCS:
-
-- SMS is delivered through the telephony stack, so the app can receive it directly with the `android.provider.Telephony.SMS_RECEIVED` broadcast.
-- RCS messages in Google Messages do not trigger that SMS broadcast, so the app cannot observe them through `SmsReceiver` alone.
-
-Because of that, Auto Relay uses two processing paths:
-
-- `SmsReceiver` handles real carrier SMS messages.
-- `MessageNotificationListenerService` handles Google Messages notifications, which gives the app a best-effort way to see incoming RCS messages.
-
-This split is intentional. It exists because SMS and RCS arrive through different Android mechanisms.
+**Why does the app use two separate message paths?**
+Android has no public API for third-party apps to receive RCS messages directly. SMS arrives via the telephony broadcast; RCS does not. See [faq/why-two-message-paths.md](faq/why-two-message-paths.md) for the full explanation, including limitations and references.
 
 ## Requirements
 
