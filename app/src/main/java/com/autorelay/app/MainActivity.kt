@@ -1,6 +1,7 @@
 package com.autorelay.app
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -37,5 +38,28 @@ class MainActivity : AppCompatActivity() {
                 else -> ""
             }
         }.attach()
+
+        supportFragmentManager.addOnBackStackChangedListener {
+            binding.containerPermissions.visibility =
+                if (supportFragmentManager.backStackEntryCount > 0) View.VISIBLE else View.GONE
+        }
+    }
+
+    fun openPermissions() {
+        binding.containerPermissions.visibility = View.VISIBLE
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.containerPermissions, PermissionsFragment())
+            .addToBackStack(null)
+            .commit()
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStack()
+        } else {
+            @Suppress("DEPRECATION")
+            super.onBackPressed()
+        }
     }
 }

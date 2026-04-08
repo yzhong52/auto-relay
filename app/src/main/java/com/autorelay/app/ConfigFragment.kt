@@ -1,11 +1,8 @@
 package com.autorelay.app
 
 import android.Manifest
-import android.content.ComponentName
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.provider.Settings
 import android.telephony.PhoneNumberFormattingTextWatcher
 import android.telephony.PhoneNumberUtils
 import android.text.InputType
@@ -27,15 +24,9 @@ class ConfigFragment : Fragment() {
 
     private lateinit var config: RelayConfig
 
-    private val requestSmsPermissions =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            updatePermissionCards()
-        }
-
     private val requestSendSms =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) {
-                // Permission just granted — show phone dialog if not yet configured
                 if (config.destinationPhone.isBlank()) showPhoneDialog() else {
                     config.smsForwardEnabled = true
                     updateRelayUi()
@@ -54,14 +45,7 @@ class ConfigFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         config = RelayConfig(requireContext())
 
-        binding.btnGrantSms.setOnClickListener {
-            requestSmsPermissions.launch(
-                arrayOf(Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS)
-            )
-        }
-        binding.btnGrantNotification.setOnClickListener {
-            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
-        }
+        binding.cardStatus.setOnClickListener { openPermissions() }
 
         binding.switchRelayEnabled.isChecked = config.relayEnabled
         binding.switchRelayEnabled.setOnCheckedChangeListener { _, checked ->
@@ -72,9 +56,7 @@ class ConfigFragment : Fragment() {
                 updateRelayUi()
             }
         }
-        binding.tvEmailDestination.setOnClickListener {
-            if (config.relayEnabled) showEmailDialog()
-        }
+        binding.layoutEmailConfig.setOnClickListener { showEmailDialog() }
 
         binding.switchSmsEnabled.isChecked = config.smsForwardEnabled
         binding.switchSmsEnabled.setOnCheckedChangeListener { _, checked ->
@@ -93,18 +75,28 @@ class ConfigFragment : Fragment() {
             config.smsForwardEnabled = checked
             updateRelayUi()
         }
-        binding.tvPhoneDestination.setOnClickListener {
-            if (config.smsForwardEnabled) showPhoneDialog()
-        }
+        binding.layoutSmsConfig.setOnClickListener { showPhoneDialog() }
 
-        updatePermissionCards()
+        updateStatusCard()
         updateRelayUi()
+
+        // Auto-navigate to permissions on first launch if anything is missing
+        if (savedInstanceState == null && !allPermissionsGranted()) {
+            openPermissions()
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        updatePermissionCards()
+        updateStatusCard()
     }
+
+    private fun openPermissions() {
+        (requireActivity() as MainActivity).openPermissions()
+    }
+
+    private fun allPermissionsGranted() =
+        hasSmsPermissions(requireContext()) && hasNotificationListenerAccess(requireContext())
 
     private fun showEmailDialog() {
         val editText = buildInputEditText(
@@ -165,59 +157,41 @@ class ConfigFragment : Fragment() {
         ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.SEND_SMS) ==
                 PackageManager.PERMISSION_GRANTED
 
-    private fun hasSmsPermissions() = listOf(
-        Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS
-    ).all {
-        ContextCompat.checkSelfPermission(requireContext(), it) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun hasNotificationListenerAccess(): Boolean {
-        val enabled = Settings.Secure.getString(
-            requireContext().contentResolver, "enabled_notification_listeners"
-        ) ?: return false
-        val expected = ComponentName(
-            requireContext(), MessageNotificationListenerService::class.java
-        ).flattenToString()
-        return enabled.split(':').any { it.equals(expected, ignoreCase = true) }
-    }
-
-    private fun updatePermissionCards() {
-        val hasSms = hasSmsPermissions()
-        binding.ivSmsStatus.setImageResource(
-            if (hasSms) R.drawable.ic_status_ok else R.drawable.ic_status_error
-        )
-        binding.tvSmsStatus.text = getString(
-            if (hasSms) R.string.sms_permission_granted else R.string.sms_permission_missing
-        )
-        binding.btnGrantSms.visibility = if (hasSms) View.GONE else View.VISIBLE
-
-        val hasNotif = hasNotificationListenerAccess()
-        binding.ivNotifStatus.setImageResource(
-            if (hasNotif) R.drawable.ic_status_ok else R.drawable.ic_status_error
-        )
-        binding.tvNotifStatus.text = getString(
-            if (hasNotif) R.string.notif_access_granted else R.string.notif_access_missing
-        )
-        binding.btnGrantNotification.visibility = if (hasNotif) View.GONE else View.VISIBLE
+    private fun updateStatusCard() {
+        val isActive = allPermissionsGranted()
+        val statusColor = ContextCompat.getColor(requireContext(),
+            if (isActive) R.color.status_active else R.color.status_error)
+        val statusBgColor = ContextCompat.getColor(requireContext(),
+            if (isActive) R.color.status_active_bg else R.color.status_error_bg)
+        binding.cardStatus.setCardBackgroundColor(statusBgColor)
+        binding.ivServiceStatus.setImageResource(
+            if (isActive) R.drawable.ic_status_ok else R.drawable.ic_status_error)
+        binding.tvServiceStatus.text = getString(
+            if (isActive) R.string.status_active else R.string.status_inactive)
+        binding.tvServiceStatus.setTextColor(statusColor)
+        binding.tvServiceStatusDesc.text = getString(
+            if (isActive) R.string.status_active_desc else R.string.status_inactive_desc)
     }
 
     private fun updateRelayUi() {
         val emailEnabled = config.relayEnabled
-        binding.tvEmailDestination.text = if (emailEnabled && config.destinationEmail.isNotBlank()) {
+        binding.tvEmailDestination.text = if (config.destinationEmail.isNotBlank()) {
             config.destinationEmail
         } else {
             getString(R.string.label_destination_not_set)
         }
-        binding.tvEmailDestination.alpha = if (emailEnabled) 1f else 0.4f
+        binding.tvEmailDestination.alpha = if (emailEnabled) 1f else 0.5f
+        binding.layoutEmailConfig.alpha = if (emailEnabled) 1f else 0.7f
 
         val smsEnabled = config.smsForwardEnabled
-        binding.tvPhoneDestination.text = if (smsEnabled && config.destinationPhone.isNotBlank()) {
+        binding.tvPhoneDestination.text = if (config.destinationPhone.isNotBlank()) {
             PhoneNumberUtils.formatNumber(config.destinationPhone, Locale.getDefault().country)
                 ?: config.destinationPhone
         } else {
             getString(R.string.label_destination_not_set)
         }
-        binding.tvPhoneDestination.alpha = if (smsEnabled) 1f else 0.4f
+        binding.tvPhoneDestination.alpha = if (smsEnabled) 1f else 0.5f
+        binding.layoutSmsConfig.alpha = if (smsEnabled) 1f else 0.7f
     }
 
     override fun onDestroyView() {
