@@ -43,7 +43,6 @@ class SmsReceiver : BroadcastReceiver() {
         // Group multi-part messages by sender
         val messageMap = mutableMapOf<String, StringBuilder>()
         var lastTimestamp = 0L
-        var lastSender = ""
 
         for (pdu in pdus) {
             val pduBytes = pdu as? ByteArray ?: continue
@@ -60,10 +59,10 @@ class SmsReceiver : BroadcastReceiver() {
 
             messageMap.getOrPut(sender) { StringBuilder() }.append(body)
             lastTimestamp = timestampMillis
-            lastSender = sender
         }
 
-        // Log each unique message (reassembled multi-part messages)
+        val config = RelayConfig(context)
+
         for ((sender, bodyBuilder) in messageMap) {
             val body = bodyBuilder.toString()
             val timestamp = TIMESTAMP_FORMAT.format(Date(lastTimestamp))
@@ -75,7 +74,19 @@ class SmsReceiver : BroadcastReceiver() {
             Log.i(TAG, "  Timestamp : $timestamp ($lastTimestamp ms)")
             Log.i(TAG, "─────────────────────────────────────")
 
-            Log.d(TAG, "SMS from=$sender timestamp=$lastTimestamp body=\"$body\"")
+            val actions = resolveActions(config)
+            RelayLog.add(
+                sender = sender,
+                messagePreview = body.take(300),
+                source = LogEntry.Source.SMS,
+                actions = actions
+            )
         }
+    }
+
+    private fun resolveActions(config: RelayConfig): List<String> = when {
+        !config.relayEnabled -> listOf("Relay disabled — message not forwarded")
+        config.destinationEmail.isBlank() -> listOf("No destination email configured")
+        else -> listOf("Forwarded to ${config.destinationEmail}")
     }
 }

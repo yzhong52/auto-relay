@@ -33,12 +33,13 @@ class MessageNotificationListenerService : NotificationListenerService() {
 
         val title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()?.trim().orEmpty()
         val text = extractMessageText(extras)
-        val subText = extras.getCharSequence(Notification.EXTRA_SUB_TEXT)?.toString()?.trim().orEmpty()
 
         if (text.isBlank()) {
             Log.d(TAG, "Ignoring Google Messages notification without message text")
             return
         }
+
+        val subText = extras.getCharSequence(Notification.EXTRA_SUB_TEXT)?.toString()?.trim().orEmpty()
 
         Log.i(TAG, "─────────────────────────────────────")
         Log.i(TAG, "Incoming message from notification")
@@ -49,6 +50,15 @@ class MessageNotificationListenerService : NotificationListenerService() {
             Log.i(TAG, "  Context   : $subText")
         }
         Log.i(TAG, "─────────────────────────────────────")
+
+        val config = RelayConfig(this)
+        val actions = resolveActions(config)
+        RelayLog.add(
+            sender = title.ifBlank { "Unknown" },
+            messagePreview = text.take(300),
+            source = LogEntry.Source.RCS,
+            actions = actions
+        )
     }
 
     private fun extractMessageText(extras: Bundle): String {
@@ -56,11 +66,16 @@ class MessageNotificationListenerService : NotificationListenerService() {
             extras.getCharSequence(Notification.EXTRA_BIG_TEXT),
             extras.getCharSequence(Notification.EXTRA_TEXT)
         )
-
         return candidates
             .firstOrNull { !it.isNullOrBlank() }
             ?.toString()
             ?.trim()
             .orEmpty()
+    }
+
+    private fun resolveActions(config: RelayConfig): List<String> = when {
+        !config.relayEnabled -> listOf("Relay disabled — message not forwarded")
+        config.destinationEmail.isBlank() -> listOf("No destination email configured")
+        else -> listOf("Forwarded to ${config.destinationEmail}")
     }
 }
