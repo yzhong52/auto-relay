@@ -10,8 +10,11 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.autorelay.app.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -39,9 +42,16 @@ class MainActivity : AppCompatActivity() {
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         binding.btnGrantPermission.setOnClickListener {
             requestSmsPermissions()
@@ -107,7 +117,7 @@ class MainActivity : AppCompatActivity() {
     private fun hasNotificationListenerAccess(): Boolean {
         val enabledListeners = Settings.Secure.getString(
             contentResolver,
-            Settings.Secure.ENABLED_NOTIFICATION_LISTENERS
+            "enabled_notification_listeners"
         ) ?: return false
 
         val expectedComponent = ComponentName(this, MessageNotificationListenerService::class.java)

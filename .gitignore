@@ -16,6 +16,7 @@ local.properties
 
 # Gradle
 .gradle/
+.gradle-local/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 
