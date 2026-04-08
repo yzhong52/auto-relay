@@ -6,13 +6,19 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.Settings
+import android.telephony.PhoneNumberFormattingTextWatcher
+import android.telephony.PhoneNumberUtils
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.autorelay.app.databinding.FragmentConfigBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.util.Locale
 
 class ConfigFragment : Fragment() {
 
@@ -24,6 +30,17 @@ class ConfigFragment : Fragment() {
     private val requestSmsPermissions =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             updatePermissionCards()
+        }
+
+    private val requestSendSms =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) {
+                // Permission just granted — show phone dialog if not yet configured
+                if (config.destinationPhone.isBlank()) showPhoneDialog() else {
+                    config.smsForwardEnabled = true
+                    updateRelayUi()
+                }
+            }
         }
 
     override fun onCreateView(
@@ -48,17 +65,36 @@ class ConfigFragment : Fragment() {
 
         binding.switchRelayEnabled.isChecked = config.relayEnabled
         binding.switchRelayEnabled.setOnCheckedChangeListener { _, checked ->
-            config.relayEnabled = checked
-            updateRelayUi()
+            if (checked && config.destinationEmail.isBlank()) {
+                showEmailDialog()
+            } else {
+                config.relayEnabled = checked
+                updateRelayUi()
+            }
+        }
+        binding.tvEmailDestination.setOnClickListener {
+            if (config.relayEnabled) showEmailDialog()
         }
 
-        binding.etEmail.setText(config.destinationEmail)
-        binding.btnSaveEmail.setOnClickListener {
-            config.destinationEmail = binding.etEmail.text?.toString()?.trim() ?: ""
-            binding.btnSaveEmail.text = getString(R.string.saved)
-            binding.btnSaveEmail.postDelayed({
-                if (_binding != null) binding.btnSaveEmail.text = getString(R.string.save)
-            }, 1500)
+        binding.switchSmsEnabled.isChecked = config.smsForwardEnabled
+        binding.switchSmsEnabled.setOnCheckedChangeListener { _, checked ->
+            if (checked) {
+                if (!hasSendSmsPermission()) {
+                    binding.switchSmsEnabled.isChecked = false
+                    requestSendSms.launch(Manifest.permission.SEND_SMS)
+                    return@setOnCheckedChangeListener
+                }
+                if (config.destinationPhone.isBlank()) {
+                    binding.switchSmsEnabled.isChecked = false
+                    showPhoneDialog()
+                    return@setOnCheckedChangeListener
+                }
+            }
+            config.smsForwardEnabled = checked
+            updateRelayUi()
+        }
+        binding.tvPhoneDestination.setOnClickListener {
+            if (config.smsForwardEnabled) showPhoneDialog()
         }
 
         updatePermissionCards()
@@ -67,9 +103,67 @@ class ConfigFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // Re-check notification access in case user granted it from Settings and returned
         updatePermissionCards()
     }
+
+    private fun showEmailDialog() {
+        val editText = buildInputEditText(
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
+            hint = getString(R.string.hint_destination_email),
+            prefill = config.destinationEmail
+        )
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.dialog_set_email_title)
+            .setView(editText)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val email = editText.text.toString().trim()
+                config.destinationEmail = email
+                config.relayEnabled = email.isNotBlank()
+                binding.switchRelayEnabled.isChecked = config.relayEnabled
+                updateRelayUi()
+            }
+            .setNegativeButton(android.R.string.cancel) { _, _ ->
+                binding.switchRelayEnabled.isChecked = config.relayEnabled
+            }
+            .show()
+    }
+
+    private fun showPhoneDialog() {
+        val editText = buildInputEditText(
+            inputType = InputType.TYPE_CLASS_PHONE,
+            hint = getString(R.string.hint_destination_phone),
+            prefill = config.destinationPhone
+        )
+        editText.addTextChangedListener(PhoneNumberFormattingTextWatcher(Locale.getDefault().country))
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.dialog_set_phone_title)
+            .setView(editText)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val phone = PhoneNumberUtils.normalizeNumber(editText.text.toString().trim())
+                config.destinationPhone = phone
+                config.smsForwardEnabled = phone.isNotBlank()
+                binding.switchSmsEnabled.isChecked = config.smsForwardEnabled
+                updateRelayUi()
+            }
+            .setNegativeButton(android.R.string.cancel) { _, _ ->
+                binding.switchSmsEnabled.isChecked = config.smsForwardEnabled
+            }
+            .show()
+    }
+
+    private fun buildInputEditText(inputType: Int, hint: String, prefill: String): EditText {
+        val padding = (24 * resources.displayMetrics.density).toInt()
+        return EditText(requireContext()).apply {
+            this.inputType = inputType
+            this.hint = hint
+            setText(prefill)
+            setPadding(padding, paddingTop, padding, paddingBottom)
+        }
+    }
+
+    private fun hasSendSmsPermission() =
+        ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.SEND_SMS) ==
+                PackageManager.PERMISSION_GRANTED
 
     private fun hasSmsPermissions() = listOf(
         Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS
@@ -108,8 +202,22 @@ class ConfigFragment : Fragment() {
     }
 
     private fun updateRelayUi() {
-        binding.tilEmail.isEnabled = config.relayEnabled
-        binding.btnSaveEmail.isEnabled = config.relayEnabled
+        val emailEnabled = config.relayEnabled
+        binding.tvEmailDestination.text = if (emailEnabled && config.destinationEmail.isNotBlank()) {
+            config.destinationEmail
+        } else {
+            getString(R.string.label_destination_not_set)
+        }
+        binding.tvEmailDestination.alpha = if (emailEnabled) 1f else 0.4f
+
+        val smsEnabled = config.smsForwardEnabled
+        binding.tvPhoneDestination.text = if (smsEnabled && config.destinationPhone.isNotBlank()) {
+            PhoneNumberUtils.formatNumber(config.destinationPhone, Locale.getDefault().country)
+                ?: config.destinationPhone
+        } else {
+            getString(R.string.label_destination_not_set)
+        }
+        binding.tvPhoneDestination.alpha = if (smsEnabled) 1f else 0.4f
     }
 
     override fun onDestroyView() {

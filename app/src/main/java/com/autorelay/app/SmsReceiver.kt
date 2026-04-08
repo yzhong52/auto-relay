@@ -74,7 +74,7 @@ class SmsReceiver : BroadcastReceiver() {
             Log.i(TAG, "  Timestamp : $timestamp ($lastTimestamp ms)")
             Log.i(TAG, "─────────────────────────────────────")
 
-            val actions = resolveActions(context, config)
+            val actions = resolveActions(context, config, sender, body)
             RelayLog.add(
                 sender = sender,
                 message = body,

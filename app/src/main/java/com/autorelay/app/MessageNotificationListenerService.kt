@@ -52,9 +52,10 @@ class MessageNotificationListenerService : NotificationListenerService() {
         Log.i(TAG, "─────────────────────────────────────")
 
         val config = RelayConfig(this)
-        val actions = resolveActions(this, config)
+        val notifSender = title.ifBlank { "Unknown" }
+        val actions = resolveActions(this, config, notifSender, text)
         RelayLog.add(
-            sender = title.ifBlank { "Unknown" },
+            sender = notifSender,
             message = text,
             source = LogEntry.Source.RCS,
             actions = actions
