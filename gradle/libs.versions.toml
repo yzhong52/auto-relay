@@ -16,11 +16,8 @@ googleGmailApi = "v1-rev20260112-2.0.0"
 google-api-client-android = "1.32.1"
 google-api-client-gson = "1.32.1"
 google-auth-library-oauth2-http = "1.16.0"
-androidMail = "1.6.7"
 
 [libraries]
-android-mail = { group = "com.sun.mail", name = "android-mail", version.ref = "androidMail" }
-android-activation = { group = "com.sun.mail", name = "android-activation", version.ref = "androidMail" }
 androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }

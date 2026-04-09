@@ -1,6 +1,7 @@
 package com.autorelay.app.engine
 
 import android.content.Context
+import android.util.Base64
 import android.util.Log
 import com.autorelay.app.data.RelayConfig
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -10,11 +11,6 @@ import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.gmail.Gmail
 import com.google.api.services.gmail.GmailScopes
 import com.google.api.services.gmail.model.Message
-import java.io.ByteArrayOutputStream
-import java.util.Properties
-import javax.mail.Session
-import javax.mail.internet.InternetAddress
-import javax.mail.internet.MimeMessage
 
 object GmailProvider {
     private const val TAG = "GmailProvider"
@@ -52,8 +48,7 @@ object GmailProvider {
                 credential
             ).setApplicationName("AutoRelay").build()
 
-            val mimeMessage = createEmail(toEmail, accountEmail, subject, bodyText)
-            val message = createMessageWithEmail(mimeMessage)
+            val message = buildRawMessage(accountEmail, toEmail, subject, bodyText)
 
             val sentMessage = service.users().messages().send("me", message).execute()
             Log.i(TAG, "Email successfully handed off to Gmail API.")
@@ -67,29 +62,10 @@ object GmailProvider {
         }
     }
 
-    private fun createEmail(
-        to: String,
-        from: String,
-        subject: String,
-        bodyText: String
-    ): MimeMessage {
-        val props = Properties()
-        val session = Session.getDefaultInstance(props, null)
-        return MimeMessage(session).apply {
-            setFrom(InternetAddress(from))
-            addRecipient(javax.mail.Message.RecipientType.TO, InternetAddress(to))
-            setSubject(subject)
-            setText(bodyText)
-        }
-    }
-
-    private fun createMessageWithEmail(content: MimeMessage): Message {
-        val buffer = ByteArrayOutputStream()
-        content.writeTo(buffer)
-        val bytes = buffer.toByteArray()
-        val encodedEmail = com.google.api.client.util.Base64.encodeBase64URLSafeString(bytes)
-        return Message().apply {
-            raw = encodedEmail
-        }
+    private fun buildRawMessage(from: String, to: String, subject: String, body: String): Message {
+        val mime = "From: $from\r\nTo: $to\r\nSubject: $subject\r\n" +
+                "MIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n$body"
+        val encoded = Base64.encodeToString(mime.toByteArray(Charsets.UTF_8), Base64.URL_SAFE or Base64.NO_WRAP)
+        return Message().apply { raw = encoded }
     }
 }
