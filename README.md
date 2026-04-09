@@ -71,13 +71,6 @@ adb logcat -s AutoRelay
 - `INTERNET` — send emails via Gmail API
 - Notification access — inspect Google Messages notifications for the RCS fallback
 
-## Architecture
-
-- [`SmsReceiver.kt`](app/src/main/java/com/autorelay/app/receiver/SmsReceiver.kt) — telephony broadcast receiver, reliable path for SMS and most OTPs
-- [`MessageNotificationListenerService.kt`](app/src/main/java/com/autorelay/app/service/MessageNotificationListenerService.kt) — notification listener for RCS fallback; skips redacted notifications
-- [`RelayEngine.kt`](app/src/main/java/com/autorelay/app/engine/RelayEngine.kt) — processes messages, deduplicates, and dispatches forwarding
-- [`GmailProvider.kt`](app/src/main/java/com/autorelay/app/engine/GmailProvider.kt) — sends email via Gmail API using OAuth
-
 ## Roadmap
 
 - [x] Forward SMS via email (Gmail OAuth)
