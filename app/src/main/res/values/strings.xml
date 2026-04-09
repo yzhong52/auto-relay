@@ -39,6 +39,8 @@
     <string name="label_destination_not_set">Not configured — tap to set</string>
     <string name="dialog_set_email_title">Forwarding email</string>
     <string name="dialog_set_phone_title">Forwarding number</string>
+    <string name="error_invalid_email">Invalid email address</string>
+    <string name="error_invalid_phone">Invalid phone number</string>
     <string name="save">Save</string>
     <string name="saved">Saved!</string>
 

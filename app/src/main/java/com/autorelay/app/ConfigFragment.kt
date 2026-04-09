@@ -9,12 +9,18 @@ import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.EditText
+import android.widget.FrameLayout
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import com.autorelay.app.databinding.FragmentConfigBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import java.util.Locale
 
 class ConfigFragment : Fragment() {
@@ -99,58 +105,125 @@ class ConfigFragment : Fragment() {
         hasSmsPermissions(requireContext()) && hasNotificationListenerAccess(requireContext())
 
     private fun showEmailDialog() {
-        val editText = buildInputEditText(
+        val (container, editText, inputLayout) = buildValidatedInput(
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
             hint = getString(R.string.hint_destination_email),
             prefill = config.destinationEmail
         )
-        MaterialAlertDialogBuilder(requireContext())
+
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.dialog_set_email_title)
-            .setView(editText)
-            .setPositiveButton(R.string.save) { _, _ ->
+            .setView(container)
+            .setPositiveButton(R.string.save, null)
+            .setNegativeButton(android.R.string.cancel) { _, _ ->
+                binding.switchRelayEnabled.isChecked = config.relayEnabled
+            }
+            .create()
+
+        dialog.setOnShowListener {
+            val saveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            
+            val validate = {
+                val email = editText.text.toString().trim()
+                val isValid = email.isEmpty() || android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+                inputLayout.error = if (isValid) null else getString(R.string.error_invalid_email)
+                saveButton.isEnabled = isValid
+            }
+
+            editText.doAfterTextChanged { validate() }
+            
+            saveButton.setOnClickListener {
                 val email = editText.text.toString().trim()
                 config.destinationEmail = email
                 config.relayEnabled = email.isNotBlank()
                 binding.switchRelayEnabled.isChecked = config.relayEnabled
                 updateRelayUi()
+                dialog.dismiss()
             }
-            .setNegativeButton(android.R.string.cancel) { _, _ ->
-                binding.switchRelayEnabled.isChecked = config.relayEnabled
-            }
-            .show()
+            
+            validate()
+            editText.requestFocus()
+            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        }
+        dialog.show()
     }
 
     private fun showPhoneDialog() {
-        val editText = buildInputEditText(
+        val (container, editText, inputLayout) = buildValidatedInput(
             inputType = InputType.TYPE_CLASS_PHONE,
             hint = getString(R.string.hint_destination_phone),
             prefill = config.destinationPhone
         )
         editText.addTextChangedListener(PhoneNumberFormattingTextWatcher(Locale.getDefault().country))
-        MaterialAlertDialogBuilder(requireContext())
+
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.dialog_set_phone_title)
-            .setView(editText)
-            .setPositiveButton(R.string.save) { _, _ ->
+            .setView(container)
+            .setPositiveButton(R.string.save, null)
+            .setNegativeButton(android.R.string.cancel) { _, _ ->
+                binding.switchSmsEnabled.isChecked = config.smsForwardEnabled
+            }
+            .create()
+
+        dialog.setOnShowListener {
+            val saveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            
+            val validate = {
+                val phone = editText.text.toString().trim()
+                val isValid = phone.isEmpty() || android.util.Patterns.PHONE.matcher(phone).matches()
+                inputLayout.error = if (isValid) null else getString(R.string.error_invalid_phone)
+                saveButton.isEnabled = isValid
+            }
+
+            editText.doAfterTextChanged { validate() }
+
+            saveButton.setOnClickListener {
                 val phone = PhoneNumberUtils.normalizeNumber(editText.text.toString().trim())
                 config.destinationPhone = phone
                 config.smsForwardEnabled = phone.isNotBlank()
                 binding.switchSmsEnabled.isChecked = config.smsForwardEnabled
                 updateRelayUi()
+                dialog.dismiss()
             }
-            .setNegativeButton(android.R.string.cancel) { _, _ ->
-                binding.switchSmsEnabled.isChecked = config.smsForwardEnabled
-            }
-            .show()
+
+            validate()
+            editText.requestFocus()
+            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        }
+        dialog.show()
     }
 
-    private fun buildInputEditText(inputType: Int, hint: String, prefill: String): EditText {
-        val padding = (24 * resources.displayMetrics.density).toInt()
-        return EditText(requireContext()).apply {
-            this.inputType = inputType
-            this.hint = hint
-            setText(prefill)
-            setPadding(padding, paddingTop, padding, paddingBottom)
+    private data class DialogInput(val container: View, val editText: EditText, val layout: TextInputLayout)
+
+    private fun buildValidatedInput(inputType: Int, hint: String, prefill: String): DialogInput {
+        val context = requireContext()
+        val layoutParams = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply {
+            val margin = (24 * resources.displayMetrics.density).toInt()
+            setMargins(margin, margin / 2, margin, 0)
         }
+
+        val inputLayout = TextInputLayout(context).apply {
+            this.hint = hint
+            this.boxBackgroundMode = TextInputLayout.BOX_BACKGROUND_OUTLINE
+            this.isErrorEnabled = true
+        }
+
+        val editText = TextInputEditText(context).apply {
+            this.inputType = inputType
+            this.setText(prefill)
+            this.isSingleLine = true
+        }
+
+        inputLayout.addView(editText)
+        
+        val container = FrameLayout(context).apply {
+            addView(inputLayout, layoutParams)
+        }
+
+        return DialogInput(container, editText, inputLayout)
     }
 
     private fun hasSendSmsPermission() =
