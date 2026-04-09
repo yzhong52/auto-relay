@@ -51,15 +51,8 @@ class MessageNotificationListenerService : NotificationListenerService() {
         }
         Log.i(TAG, "─────────────────────────────────────")
 
-        val config = RelayConfig(this)
         val notifSender = title.ifBlank { "Unknown" }
-        val actions = resolveActions(this, config, notifSender, text)
-        RelayLog.add(
-            sender = notifSender,
-            message = text,
-            source = LogEntry.Source.RCS,
-            actions = actions
-        )
+        RelayEngine.processIncomingMessage(this, notifSender, text, LogEntry.Source.RCS)
     }
 
     private fun extractMessageText(extras: Bundle): String {

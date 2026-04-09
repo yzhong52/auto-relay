@@ -61,7 +61,6 @@ class SmsReceiver : BroadcastReceiver() {
             lastTimestamp = timestampMillis
         }
 
-        val config = RelayConfig(context)
 
         for ((sender, bodyBuilder) in messageMap) {
             val body = bodyBuilder.toString()
@@ -74,14 +73,7 @@ class SmsReceiver : BroadcastReceiver() {
             Log.i(TAG, "  Timestamp : $timestamp ($lastTimestamp ms)")
             Log.i(TAG, "─────────────────────────────────────")
 
-            val actions = resolveActions(context, config, sender, body)
-            RelayLog.add(
-                sender = sender,
-                message = body,
-                source = LogEntry.Source.SMS,
-                actions = actions
-            )
+            RelayEngine.processIncomingMessage(context, sender, body, LogEntry.Source.SMS)
         }
     }
-
 }

@@ -3,7 +3,6 @@ package com.autorelay.app
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.telephony.PhoneNumberFormattingTextWatcher
 import android.telephony.PhoneNumberUtils
 import android.text.InputType
 import android.view.LayoutInflater
@@ -83,6 +82,13 @@ class ConfigFragment : Fragment() {
         }
         binding.layoutSmsConfig.setOnClickListener { showPhoneDialog() }
 
+        binding.btnTestRelay.setOnClickListener {
+            val title = getString(R.string.test_relay_title)
+            val body = getString(R.string.test_relay_body)
+            RelayEngine.processIncomingMessage(requireContext(), "Test Sender", body, LogEntry.Source.SMS)
+            com.google.android.material.snackbar.Snackbar.make(binding.root, R.string.test_relay_initiated, com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show()
+        }
+
         updateStatusCard()
         updateRelayUi()
 
@@ -154,7 +160,6 @@ class ConfigFragment : Fragment() {
             hint = getString(R.string.hint_destination_phone),
             prefill = config.destinationPhone
         )
-        editText.addTextChangedListener(PhoneNumberFormattingTextWatcher(Locale.getDefault().country))
 
         val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.dialog_set_phone_title)
@@ -168,14 +173,39 @@ class ConfigFragment : Fragment() {
         dialog.setOnShowListener {
             val saveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
             
-            val validate = {
-                val phone = editText.text.toString().trim()
+            // Modern formatting logic using PhoneNumberUtils
+            var isFormatting = false
+            editText.doAfterTextChanged { s ->
+                if (isFormatting) return@doAfterTextChanged
+                
+                val input = s.toString()
+                val countryCode = Locale.getDefault().country.ifBlank { "US" }
+                val formatted = PhoneNumberUtils.formatNumber(input, countryCode)
+                
+                if (formatted != null && formatted != input) {
+                    isFormatting = true
+                    val selectionStart = editText.selectionStart
+                    val selectionEnd = editText.selectionEnd
+                    
+                    // Attempt to preserve cursor position relative to the characters
+                    // This is a simplified version of what the platform watcher does
+                    editText.setText(formatted)
+                    
+                    // Simple cursor preservation: if we were at the end, stay at the end
+                    if (selectionStart == input.length) {
+                        editText.setSelection(formatted.length)
+                    } else {
+                        editText.setSelection(minOf(selectionStart, formatted.length))
+                    }
+                    isFormatting = false
+                }
+                
+                // Validation
+                val phone = s.toString().trim()
                 val isValid = phone.isEmpty() || android.util.Patterns.PHONE.matcher(phone).matches()
                 inputLayout.error = if (isValid) null else getString(R.string.error_invalid_phone)
                 saveButton.isEnabled = isValid
             }
-
-            editText.doAfterTextChanged { validate() }
 
             saveButton.setOnClickListener {
                 val phone = PhoneNumberUtils.normalizeNumber(editText.text.toString().trim())
@@ -185,8 +215,12 @@ class ConfigFragment : Fragment() {
                 updateRelayUi()
                 dialog.dismiss()
             }
+            
+            // Initial validation and keyboard show
+            val initialPhone = editText.text.toString().trim()
+            val initialValid = initialPhone.isEmpty() || android.util.Patterns.PHONE.matcher(initialPhone).matches()
+            saveButton.isEnabled = initialValid
 
-            validate()
             editText.requestFocus()
             dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         }

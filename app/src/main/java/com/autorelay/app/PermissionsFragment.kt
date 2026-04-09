@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.autorelay.app.databinding.FragmentPermissionsBinding
 
@@ -54,12 +55,16 @@ class PermissionsFragment : Fragment() {
 
     private fun updatePermissionCards() {
         val hasSms = hasSmsPermissions(requireContext())
+        val okColor = ContextCompat.getColor(requireContext(), R.color.status_active)
+        val errorColor = ContextCompat.getColor(requireContext(), R.color.status_error)
+
         binding.ivSmsStatus.setImageResource(
             if (hasSms) R.drawable.ic_status_ok else R.drawable.ic_status_error
         )
         binding.tvSmsStatus.text = getString(
             if (hasSms) R.string.sms_permission_granted else R.string.sms_permission_missing
         )
+        binding.tvSmsStatus.setTextColor(if (hasSms) okColor else errorColor)
         binding.btnGrantSms.visibility = if (hasSms) View.GONE else View.VISIBLE
 
         val hasNotif = hasNotificationListenerAccess(requireContext())
@@ -69,6 +74,7 @@ class PermissionsFragment : Fragment() {
         binding.tvNotifStatus.text = getString(
             if (hasNotif) R.string.notif_access_granted else R.string.notif_access_missing
         )
+        binding.tvNotifStatus.setTextColor(if (hasNotif) okColor else errorColor)
         binding.btnGrantNotification.visibility = if (hasNotif) View.GONE else View.VISIBLE
     }
 

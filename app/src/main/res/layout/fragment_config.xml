@@ -176,5 +176,15 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Test section -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTestRelay"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/btn_test_relay"
+            app:icon="@drawable/ic_test" />
+
     </LinearLayout>
 </ScrollView>
