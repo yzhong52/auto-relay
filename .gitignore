@@ -31,3 +31,7 @@ build/
 
 # Google Services
 google-services.json
+
+# Accidentally created properties files outside of root
+*.properties
+!gradle.properties
