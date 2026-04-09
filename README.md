@@ -37,6 +37,18 @@ Recommended JDK:
 
 Open the project in Android Studio. It will sync Gradle and download dependencies automatically. Connect a device or start an emulator, then click **Run**.
 
+### Configuring the Gmail API (Optional)
+
+To enable email forwarding, you need to provide your own Google Cloud credentials:
+
+1.  Create a project in the [Google Cloud Console](https://console.cloud.google.com/).
+2.  Enable the **Gmail API**.
+3.  Configure the **OAuth consent screen** and add your email as a **Test User**.
+4.  Create two **OAuth client IDs**:
+    -   **Android**: Use package name `com.autorelay.app` and your debug SHA-1.
+    -   **Web Application**: To be used as the `GMAIL_CLIENT_ID`.
+5.  Copy `local.properties.example` to `local.properties` and paste your **Web Client ID**.
+
 ### Via Command Line
 
 ```sh
@@ -68,6 +80,7 @@ The app uses the following access:
 
 - `RECEIVE_SMS` — listen for incoming SMS
 - `READ_SMS` — read SMS message content
+- `INTERNET` — send emails via Gmail API
 - Notification access — inspect Google Messages notifications for the RCS fallback
 
 ## Current Architecture
@@ -80,6 +93,6 @@ The app uses the following access:
 
 - [ ] Forward SMS to another phone number
 - [ ] Forward RCS-derived notification messages
-- [ ] Forward SMS via email
+- [x] Forward SMS via email
 - [ ] Configurable forwarding rules
 - [ ] Notification on forward

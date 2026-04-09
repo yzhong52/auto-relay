@@ -16,6 +16,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import com.autorelay.app.BuildConfig
 import com.autorelay.app.R
 import com.autorelay.app.data.LogEntry
 import com.autorelay.app.data.RelayConfig
@@ -23,9 +24,13 @@ import com.autorelay.app.databinding.FragmentConfigBinding
 import com.autorelay.app.engine.RelayEngine
 import com.autorelay.app.util.hasNotificationListenerAccess
 import com.autorelay.app.util.hasSmsPermissions
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.Scope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.api.services.gmail.GmailScopes
 import java.util.Locale
 
 class ConfigFragment : Fragment() {
@@ -38,10 +43,25 @@ class ConfigFragment : Fragment() {
     private val requestSendSms =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) {
-                if (config.destinationPhone.isBlank()) showPhoneDialog() else {
+                if (config.destinationPhoneNumber.isBlank()) showPhoneDialog() else {
                     config.smsForwardEnabled = true
                     updateRelayUi()
                 }
+            }
+        }
+
+    private val googleSignInLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(com.google.android.gms.common.api.ApiException::class.java)
+                if (account != null) {
+                    config.googleAccountEmail = account.email ?: ""
+                    config.emailForwardEnabled = true
+                    updateRelayUi()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
 
@@ -58,12 +78,12 @@ class ConfigFragment : Fragment() {
 
         binding.cardStatus.setOnClickListener { openPermissions() }
 
-        binding.switchRelayEnabled.isChecked = config.relayEnabled
+        binding.switchRelayEnabled.isChecked = config.emailForwardEnabled
         binding.switchRelayEnabled.setOnCheckedChangeListener { _, checked ->
             if (checked && config.destinationEmail.isBlank()) {
                 showEmailDialog()
             } else {
-                config.relayEnabled = checked
+                config.emailForwardEnabled = checked
                 updateRelayUi()
             }
         }
@@ -77,7 +97,7 @@ class ConfigFragment : Fragment() {
                     requestSendSms.launch(Manifest.permission.SEND_SMS)
                     return@setOnCheckedChangeListener
                 }
-                if (config.destinationPhone.isBlank()) {
+                if (config.destinationPhoneNumber.isBlank()) {
                     binding.switchSmsEnabled.isChecked = false
                     showPhoneDialog()
                     return@setOnCheckedChangeListener
@@ -87,6 +107,14 @@ class ConfigFragment : Fragment() {
             updateRelayUi()
         }
         binding.layoutSmsConfig.setOnClickListener { showPhoneDialog() }
+
+        binding.btnGoogleAuth.setOnClickListener {
+            if (config.googleAccountEmail.isBlank()) {
+                startGoogleSignIn()
+            } else {
+                signOutGoogle()
+            }
+        }
 
         binding.btnTestRelay.setOnClickListener {
             val body = getString(R.string.test_relay_body)
@@ -126,7 +154,7 @@ class ConfigFragment : Fragment() {
             .setView(container)
             .setPositiveButton(R.string.save, null)
             .setNegativeButton(android.R.string.cancel) { _, _ ->
-                binding.switchRelayEnabled.isChecked = config.relayEnabled
+                binding.switchRelayEnabled.isChecked = config.emailForwardEnabled
             }
             .create()
 
@@ -145,8 +173,8 @@ class ConfigFragment : Fragment() {
             saveButton.setOnClickListener {
                 val email = editText.text.toString().trim()
                 config.destinationEmail = email
-                config.relayEnabled = email.isNotBlank()
-                binding.switchRelayEnabled.isChecked = config.relayEnabled
+                config.emailForwardEnabled = email.isNotBlank()
+                binding.switchRelayEnabled.isChecked = config.emailForwardEnabled
                 updateRelayUi()
                 dialog.dismiss()
             }
@@ -162,7 +190,7 @@ class ConfigFragment : Fragment() {
         val (container, editText, inputLayout) = buildValidatedInput(
             inputType = InputType.TYPE_CLASS_PHONE,
             hint = getString(R.string.hint_destination_phone),
-            prefill = config.destinationPhone
+            prefill = config.destinationPhoneNumber
         )
 
         val dialog = MaterialAlertDialogBuilder(requireContext())
@@ -205,7 +233,7 @@ class ConfigFragment : Fragment() {
 
             saveButton.setOnClickListener {
                 val phone = PhoneNumberUtils.normalizeNumber(editText.text.toString().trim())
-                config.destinationPhone = phone
+                config.destinationPhoneNumber = phone
                 config.smsForwardEnabled = phone.isNotBlank()
                 binding.switchSmsEnabled.isChecked = config.smsForwardEnabled
                 updateRelayUi()
@@ -273,8 +301,37 @@ class ConfigFragment : Fragment() {
             if (isActive) R.string.status_active_desc else R.string.status_inactive_desc)
     }
 
+    private fun startGoogleSignIn() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail()
+            .requestScopes(Scope(GmailScopes.GMAIL_SEND))
+            .build()
+
+        val client = GoogleSignIn.getClient(requireActivity(), gso)
+        googleSignInLauncher.launch(client.signInIntent)
+    }
+
+    private fun signOutGoogle() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
+        GoogleSignIn.getClient(requireActivity(), gso).signOut().addOnCompleteListener {
+            config.googleAccountEmail = ""
+            config.emailForwardEnabled = false
+            updateRelayUi()
+        }
+    }
+
     private fun updateRelayUi() {
-        val emailEnabled = config.relayEnabled
+        val emailEnabled = config.emailForwardEnabled
+        binding.switchRelayEnabled.isChecked = emailEnabled
+
+        if (config.googleAccountEmail.isNotBlank()) {
+            binding.tvGoogleAccountStatus.text = getString(R.string.google_account_linked, config.googleAccountEmail)
+            binding.btnGoogleAuth.text = getString(R.string.btn_google_sign_out)
+        } else {
+            binding.tvGoogleAccountStatus.text = getString(R.string.google_sign_in_required)
+            binding.btnGoogleAuth.text = getString(R.string.btn_google_sign_in)
+        }
+
         binding.tvEmailDestination.text = if (config.destinationEmail.isNotBlank()) {
             config.destinationEmail
         } else {
@@ -284,9 +341,9 @@ class ConfigFragment : Fragment() {
         binding.layoutEmailConfig.alpha = if (emailEnabled) 1f else 0.7f
 
         val smsEnabled = config.smsForwardEnabled
-        binding.tvPhoneDestination.text = if (config.destinationPhone.isNotBlank()) {
-            PhoneNumberUtils.formatNumber(config.destinationPhone, Locale.getDefault().country)
-                ?: config.destinationPhone
+        binding.tvPhoneDestination.text = if (config.destinationPhoneNumber.isNotBlank()) {
+            PhoneNumberUtils.formatNumber(config.destinationPhoneNumber, Locale.getDefault().country)
+                ?: config.destinationPhoneNumber
         } else {
             getString(R.string.label_destination_not_set)
         }

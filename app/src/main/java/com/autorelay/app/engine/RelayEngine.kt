@@ -25,31 +25,21 @@ object RelayEngine {
         val config = RelayConfig(context)
         val actions = mutableListOf<String>()
 
-        if (config.relayEnabled) {
-            if (config.destinationEmail.isBlank()) {
-                actions.add(context.getString(R.string.action_no_email))
+        if (config.emailForwardEnabled) {
+            if (config.destinationEmail.isNotBlank()) {
+                actions.add(context.getString(R.string.action_forwarded, config.destinationEmail))
             } else {
-                val success = forwardToEmail(config.destinationEmail, sender, body)
-                if (success) {
-                    actions.add(context.getString(R.string.action_forwarded, config.destinationEmail))
-                } else {
-                    actions.add("Email relay failed (check network)")
-                }
+                actions.add(context.getString(R.string.action_no_email))
             }
         }
 
         if (config.smsForwardEnabled) {
-            if (config.destinationPhone.isBlank()) {
-                actions.add(context.getString(R.string.action_no_phone))
+            if (config.destinationPhoneNumber.isNotBlank()) {
+                val displayPhone = PhoneNumberUtils.formatNumber(config.destinationPhoneNumber, Locale.getDefault().country)
+                    ?: config.destinationPhoneNumber
+                actions.add(context.getString(R.string.action_sms_forwarded, displayPhone))
             } else {
-                val success = forwardToSms(context, config.destinationPhone, sender, body)
-                if (success) {
-                    val displayPhone = PhoneNumberUtils.formatNumber(config.destinationPhone, Locale.getDefault().country)
-                        ?: config.destinationPhone
-                    actions.add(context.getString(R.string.action_sms_forwarded, displayPhone))
-                } else {
-                    actions.add("SMS relay failed")
-                }
+                actions.add(context.getString(R.string.action_no_phone))
             }
         }
 
@@ -57,12 +47,23 @@ object RelayEngine {
             actions.add(context.getString(R.string.action_relay_disabled))
         }
 
+        // Add the initial log entry
         RelayLog.add(
             sender = sender,
             message = body,
             source = source,
             actions = actions
         )
+
+        // Execute background tasks
+        Thread {
+            if (config.emailForwardEnabled && config.destinationEmail.isNotBlank()) {
+                forwardToEmail(context, config.destinationEmail, sender, body)
+            }
+            if (config.smsForwardEnabled && config.destinationPhoneNumber.isNotBlank()) {
+                forwardToSms(context, config.destinationPhoneNumber, sender, body)
+            }
+        }.start()
 
         return actions
     }
@@ -84,9 +85,9 @@ object RelayEngine {
         }
     }
 
-    private fun forwardToEmail(destination: String, originalSender: String, body: String): Boolean {
-        // TODO: Implement actual email sending (e.g. SMTP or HTTP API)
-        Log.i(TAG, "Email relay not yet implemented (destination=$destination)")
-        return false
+    private fun forwardToEmail(context: Context, destination: String, originalSender: String, body: String): Boolean {
+        val subject = "Forwarded message from $originalSender"
+        val bodyText = "From: $originalSender\n\n$body"
+        return GmailProvider.sendEmail(context, destination, subject, bodyText)
     }
 }

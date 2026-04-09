@@ -32,7 +32,12 @@
     <string name="grant">Grant</string>
 
     <!-- Config: relay settings -->
-    <string name="label_forward_to_email">Email forwarding</string>
+    <string name="label_forward_to_email">Gmail forwarding (OAuth2)</string>
+    <string name="label_google_account">Google Account</string>
+    <string name="btn_google_sign_in">Sign in with Google</string>
+    <string name="btn_google_sign_out">Sign out</string>
+    <string name="google_sign_in_required">Sign in required for Gmail API</string>
+    <string name="google_account_linked">Signed in as %s</string>
     <string name="label_forward_via_sms">Text forwarding</string>
     <string name="hint_destination_email">Destination email address</string>
     <string name="hint_destination_phone">Destination phone number</string>
