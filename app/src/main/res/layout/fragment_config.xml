@@ -116,14 +116,6 @@
 
                     </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/tvEmailDestination"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:textAppearance="?attr/textAppearanceCaption"
-                        android:textColor="?android:attr/textColorSecondary" />
-
                     <!-- Google Sign-in area -->
                     <LinearLayout
                         android:id="@+id/layoutGoogleAuth"

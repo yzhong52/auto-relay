@@ -85,14 +85,15 @@ class ConfigFragment : Fragment() {
 
         binding.switchRelayEnabled.isChecked = config.emailForwardEnabled
         binding.switchRelayEnabled.setOnCheckedChangeListener { _, checked ->
-            if (checked && config.destinationEmail.isBlank()) {
-                showEmailDialog()
+            if (checked && config.googleAccountEmail.isBlank()) {
+                binding.switchRelayEnabled.isChecked = false
+                startGoogleSignIn()
             } else {
                 config.emailForwardEnabled = checked
                 updateRelayUi()
             }
         }
-        binding.layoutEmailConfig.setOnClickListener { showEmailDialog() }
+        binding.layoutEmailConfig.setOnClickListener { startGoogleSignIn() }
 
         binding.switchSmsEnabled.isChecked = config.smsForwardEnabled
         binding.switchSmsEnabled.setOnCheckedChangeListener { _, checked ->
@@ -146,50 +147,6 @@ class ConfigFragment : Fragment() {
 
     private fun allPermissionsGranted() =
         hasSmsPermissions(requireContext()) && hasNotificationListenerAccess(requireContext())
-
-    private fun showEmailDialog() {
-        val (container, editText, inputLayout) = buildValidatedInput(
-            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
-            hint = getString(R.string.hint_destination_email),
-            prefill = config.destinationEmail
-        )
-
-        val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.dialog_set_email_title)
-            .setView(container)
-            .setPositiveButton(R.string.save, null)
-            .setNegativeButton(android.R.string.cancel) { _, _ ->
-                binding.switchRelayEnabled.isChecked = config.emailForwardEnabled
-            }
-            .create()
-
-        dialog.setOnShowListener {
-            val saveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-
-            val validate = {
-                val email = editText.text.toString().trim()
-                val isValid = email.isEmpty() || android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-                inputLayout.error = if (isValid) null else getString(R.string.error_invalid_email)
-                saveButton.isEnabled = isValid
-            }
-
-            editText.doAfterTextChanged { validate() }
-
-            saveButton.setOnClickListener {
-                val email = editText.text.toString().trim()
-                config.destinationEmail = email
-                config.emailForwardEnabled = email.isNotBlank()
-                binding.switchRelayEnabled.isChecked = config.emailForwardEnabled
-                updateRelayUi()
-                dialog.dismiss()
-            }
-
-            validate()
-            editText.requestFocus()
-            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        }
-        dialog.show()
-    }
 
     private fun showPhoneDialog() {
         val (container, editText, inputLayout) = buildValidatedInput(
@@ -337,12 +294,6 @@ class ConfigFragment : Fragment() {
             binding.btnGoogleAuth.text = getString(R.string.btn_google_sign_in)
         }
 
-        binding.tvEmailDestination.text = if (config.destinationEmail.isNotBlank()) {
-            config.destinationEmail
-        } else {
-            getString(R.string.label_destination_not_set)
-        }
-        binding.tvEmailDestination.alpha = if (emailEnabled) 1f else 0.5f
         binding.layoutEmailConfig.alpha = if (emailEnabled) 1f else 0.7f
 
         val smsEnabled = config.smsForwardEnabled

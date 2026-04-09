@@ -39,12 +39,9 @@
     <string name="google_sign_in_required">Sign in required for Gmail API</string>
     <string name="google_account_linked">Signed in as %s</string>
     <string name="label_forward_via_sms">Text forwarding</string>
-    <string name="hint_destination_email">Destination email address</string>
     <string name="hint_destination_phone">Destination phone number</string>
     <string name="label_destination_not_set">Not configured — tap to set</string>
-    <string name="dialog_set_email_title">Forwarding email</string>
     <string name="dialog_set_phone_title">Forwarding number</string>
-    <string name="error_invalid_email">Invalid email address</string>
     <string name="error_sign_in_failed">Google Sign-In failed — please try again</string>
     <string name="error_invalid_phone">Invalid phone number</string>
     <string name="save">Save</string>
@@ -63,7 +60,6 @@
     <string name="action_skipped_sensitive">Skipped — not a message</string>
     <string name="action_skipped_unknown_sender">Skipped — sender could not be identified</string>
     <string name="action_relay_disabled">Relay disabled — message not forwarded</string>
-    <string name="action_no_email">No destination email configured</string>
     <string name="action_forwarded">Forwarded to %s</string>
     <string name="action_email_failed">Email forward failed — check network or sign-in</string>
     <string name="action_no_phone">No destination phone configured</string>

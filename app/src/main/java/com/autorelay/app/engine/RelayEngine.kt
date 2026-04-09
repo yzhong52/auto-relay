@@ -18,7 +18,7 @@ object RelayEngine {
     private const val DEDUP_WINDOW_MS = 30_000L
     private val NOISE_PATTERNS = listOf(
         "sensitive notification content hidden",
-        "is doing work in the background"
+        "messages is doing work in the background"
     )
     private val recentBodyHashes = mutableListOf<Pair<Int, Long>>()
 
@@ -61,15 +61,11 @@ object RelayEngine {
             }
 
             if (config.emailForwardEnabled) {
-                if (config.destinationEmail.isBlank()) {
-                    actions.add(context.getString(R.string.action_no_email))
-                } else {
-                    val success = forwardToEmail(context, config.destinationEmail, sender, body)
-                    actions.add(
-                        if (success) context.getString(R.string.action_forwarded, config.destinationEmail)
-                        else context.getString(R.string.action_email_failed)
-                    )
-                }
+                val success = forwardToEmail(context, config.googleAccountEmail, sender, body)
+                actions.add(
+                    if (success) context.getString(R.string.action_forwarded, config.googleAccountEmail)
+                    else context.getString(R.string.action_email_failed)
+                )
             }
 
             if (config.smsForwardEnabled) {

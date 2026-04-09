@@ -10,10 +10,6 @@ class RelayConfig(context: Context) {
         get() = prefs.getBoolean(KEY_EMAIL_FORWARD_ENABLED, false)
         set(value) { prefs.edit { putBoolean(KEY_EMAIL_FORWARD_ENABLED, value) } }
 
-    var destinationEmail: String
-        get() = prefs.getString(KEY_EMAIL, "") ?: ""
-        set(value) { prefs.edit { putString(KEY_EMAIL, value) } }
-
     var smsForwardEnabled: Boolean
         get() = prefs.getBoolean(KEY_SMS_ENABLED, false)
         set(value) { prefs.edit { putBoolean(KEY_SMS_ENABLED, value) } }
@@ -28,7 +24,6 @@ class RelayConfig(context: Context) {
 
     companion object {
         private const val KEY_EMAIL_FORWARD_ENABLED = "email_forward_enabled"
-        private const val KEY_EMAIL = "destination_email"
         private const val KEY_SMS_ENABLED = "sms_forward_enabled"
         private const val KEY_PHONE = "destination_phone_number"
         private const val KEY_GOOGLE_ACCOUNT = "google_account_email"
