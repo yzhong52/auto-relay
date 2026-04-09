@@ -1,6 +1,0 @@
-# AutoRelay Configuration Template
-# Copy this file to 'local.properties' and fill in your values.
-
-# The Web Client ID from Google Cloud Console (APIs & Services > Credentials)
-# Required for Gmail API integration.
-GMAIL_CLIENT_ID=your_web_client_id_here.apps.googleusercontent.com
