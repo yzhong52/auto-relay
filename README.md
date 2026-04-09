@@ -71,11 +71,3 @@ adb logcat -s AutoRelay
 - `INTERNET` — send emails via Gmail API
 - Notification access — inspect Google Messages notifications for the RCS fallback
 
-## Roadmap
-
-- [x] Forward SMS via email (Gmail OAuth)
-- [x] Forward SMS to another phone number
-- [x] RCS fallback via notification listener
-- [x] Deduplicate SMS + RCS for the same message
-- [ ] Configurable forwarding rules (sender filter, keyword match)
-- [ ] Notification on successful forward
