@@ -46,6 +46,16 @@ object RelayEngine {
                 return@Thread
             }
 
+            if (sender.isBlank()) {
+                RelayLog.add(sender, body, source, listOf(context.getString(R.string.action_skipped_unknown_sender)))
+                return@Thread
+            }
+
+            if (body.contains("sensitive notification content hidden", ignoreCase = true)) {
+                RelayLog.add(sender, body, source, listOf(context.getString(R.string.action_skipped_sensitive)))
+                return@Thread
+            }
+
             if (config.emailForwardEnabled) {
                 if (config.destinationEmail.isBlank()) {
                     actions.add(context.getString(R.string.action_no_email))

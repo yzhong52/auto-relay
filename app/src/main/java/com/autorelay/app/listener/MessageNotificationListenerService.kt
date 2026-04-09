@@ -36,13 +36,7 @@ class MessageNotificationListenerService : NotificationListenerService() {
         val title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()?.trim().orEmpty()
         val text = extractMessageText(extras)
 
-        if (text.isBlank() || title.isBlank()) {
-            Log.d(TAG, "Ignoring Google Messages notification without message text or title")
-            return
-        }
-
-        if (text.contains("sensitive notification content hidden", ignoreCase = true)) {
-            Log.d(TAG, "Ignoring redacted notification — content hidden by Android")
+        if (text.isBlank()) {
             return
         }
 
@@ -58,8 +52,7 @@ class MessageNotificationListenerService : NotificationListenerService() {
         }
         Log.i(TAG, "─────────────────────────────────────")
 
-        val notifSender = title.ifBlank { "Unknown" }
-        RelayEngine.processIncomingMessage(this, notifSender, text, LogEntry.Source.RCS)
+        RelayEngine.processIncomingMessage(this, title, text, LogEntry.Source.RCS)
     }
 
     private fun extractMessageText(extras: Bundle): String {
