@@ -82,8 +82,7 @@ object RelayEngine {
 
     private fun forwardToEmail(destination: String, originalSender: String, body: String): Boolean {
         // TODO: Implement actual email sending (e.g. SMTP or HTTP API)
-        // For now, we'll log it as a simulation.
-        Log.i(TAG, "Simulating email relay to $destination: From $originalSender - $body")
-        return true 
+        Log.i(TAG, "Email relay not yet implemented (destination=$destination)")
+        return false
     }
 }

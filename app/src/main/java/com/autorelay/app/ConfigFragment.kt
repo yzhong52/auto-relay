@@ -83,7 +83,6 @@ class ConfigFragment : Fragment() {
         binding.layoutSmsConfig.setOnClickListener { showPhoneDialog() }
 
         binding.btnTestRelay.setOnClickListener {
-            val title = getString(R.string.test_relay_title)
             val body = getString(R.string.test_relay_body)
             RelayEngine.processIncomingMessage(requireContext(), "Test Sender", body, LogEntry.Source.SMS)
             com.google.android.material.snackbar.Snackbar.make(binding.root, R.string.test_relay_initiated, com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show()
@@ -185,10 +184,6 @@ class ConfigFragment : Fragment() {
                 if (formatted != null && formatted != input) {
                     isFormatting = true
                     val selectionStart = editText.selectionStart
-                    val selectionEnd = editText.selectionEnd
-                    
-                    // Attempt to preserve cursor position relative to the characters
-                    // This is a simplified version of what the platform watcher does
                     editText.setText(formatted)
                     
                     // Simple cursor preservation: if we were at the end, stay at the end
