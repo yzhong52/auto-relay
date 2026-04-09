@@ -6,7 +6,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.provider.Settings
 import androidx.core.content.ContextCompat
-import com.autorelay.app.service.MessageNotificationListenerService
+import com.autorelay.app.listener.MessageNotificationListenerService
 
 fun hasSmsPermissions(context: Context) = listOf(
     Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS
