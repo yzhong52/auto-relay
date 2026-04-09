@@ -52,7 +52,8 @@ class MessageNotificationListenerService : NotificationListenerService() {
         }
         Log.i(TAG, "─────────────────────────────────────")
 
-        RelayEngine.processIncomingMessage(this, title, text, LogEntry.Source.RCS)
+        val sender = title  // notification title is the closest equivalent to a sender name for RCS
+        RelayEngine.processIncomingMessage(this, sender, text, LogEntry.Source.RCS)
     }
 
     private fun extractMessageText(extras: Bundle): String {
