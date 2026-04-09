@@ -16,6 +16,10 @@ import java.util.Locale
 object RelayEngine {
     private const val TAG = "RelayEngine"
     private const val DEDUP_WINDOW_MS = 30_000L
+    private val NOISE_PATTERNS = listOf(
+        "sensitive notification content hidden",
+        "is doing work in the background"
+    )
     private val recentBodyHashes = mutableListOf<Pair<Int, Long>>()
 
     @Synchronized
@@ -51,7 +55,7 @@ object RelayEngine {
                 return@Thread
             }
 
-            if (body.contains("sensitive notification content hidden", ignoreCase = true)) {
+            if (NOISE_PATTERNS.any { body.contains(it, ignoreCase = true) }) {
                 RelayLog.add(sender, body, source, listOf(context.getString(R.string.action_skipped_sensitive)))
                 return@Thread
             }
