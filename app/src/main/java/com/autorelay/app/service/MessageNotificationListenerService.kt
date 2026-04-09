@@ -41,6 +41,11 @@ class MessageNotificationListenerService : NotificationListenerService() {
             return
         }
 
+        if (text.contains("sensitive notification content hidden", ignoreCase = true)) {
+            Log.d(TAG, "Ignoring redacted notification — content hidden by Android")
+            return
+        }
+
         val subText = extras.getCharSequence(Notification.EXTRA_SUB_TEXT)?.toString()?.trim().orEmpty()
 
         Log.i(TAG, "─────────────────────────────────────")

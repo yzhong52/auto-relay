@@ -10,26 +10,26 @@ Email forwarding also unlocks agentic workflows: an AI agent monitoring an inbox
 
 ## Features
 
-- Receives incoming SMS messages in the background via `SMS_RECEIVED`
-- Detects Google Messages notifications as a fallback for RCS messages
-- Logs sender, body, and timestamp to logcat (tag: `AutoRelay`)
-- Requests SMS permissions at runtime
-- Guides the user to grant notification access for the RCS fallback
+- Forwards incoming SMS messages to email (via Gmail API + OAuth) or another phone number
+- Detects Google Messages notifications as a best-effort fallback for RCS messages
+- Deduplicates messages that arrive via both SMS and RCS notification
+- Logs all received messages and forwarding outcomes in-app
 
-## FAQ
+## RCS Limitations
 
-**Why does the app use two separate message paths?**
-Android has no public API for third-party apps to receive RCS messages directly. SMS arrives via the telephony broadcast; RCS does not. See [faq/why-two-message-paths.md](faq/why-two-message-paths.md) for the full explanation, including limitations and references.
+Android has no public API for third-party apps to receive RCS messages directly. The RCS path works by listening to Google Messages notifications, which has two important limitations:
+
+1. **Sensitive notifications are redacted.** Android allows apps to mark notifications as sensitive, and Google Messages does this for OTPs, verification codes, and bank alerts — exactly the messages you care about. These arrive with the content replaced by "Sensitive notification content hidden" and the sender replaced by "Unknown". Auto Relay detects and discards these silently.
+
+2. **Duplicates with SMS.** Many carriers deliver the same message over both SMS and RCS. When this happens, Auto Relay receives it twice — once via the telephony broadcast and once via the notification. The deduplication logic suppresses the second arrival within a 30-second window.
+
+**In practice:** the SMS path is reliable for OTPs and bank codes. The RCS path adds coverage for messages that arrive only as RCS (e.g. some iMessage-to-Android flows) but will miss sensitive ones.
 
 ## Requirements
 
 - Android 8.0+ (API 26+)
-- Android device notifications enabled for Google Messages if you want the RCS fallback
-- A JDK (e.g. [Temurin](https://adoptium.net)) or Android Studio
-
-Recommended JDK:
-
-- JDK 17 or 21 for Gradle/Android Studio compatibility
+- Google Messages installed and set as the default SMS app for the RCS fallback
+- A JDK (e.g. [Temurin](https://adoptium.net)) or Android Studio (JDK 17 or 21 recommended)
 
 ## Build & Run
 
@@ -39,15 +39,16 @@ Open the project in Android Studio. It will sync Gradle and download dependencie
 
 ### Configuring the Gmail API (Optional)
 
-To enable email forwarding, you need to provide your own Google Cloud credentials:
+To enable email forwarding, set up a Google Cloud project:
 
-1.  Create a project in the [Google Cloud Console](https://console.cloud.google.com/).
-2.  Enable the **Gmail API**.
-3.  Configure the **OAuth consent screen** and add your email as a **Test User**.
-4.  Create two **OAuth client IDs**:
-    -   **Android**: Use package name `com.autorelay.app` and your debug SHA-1.
-    -   **Web Application**: To be used as the `GMAIL_CLIENT_ID`.
-5.  Copy `local.properties.example` to `local.properties` and paste your **Web Client ID**.
+1. Create a project in the [Google Cloud Console](https://console.cloud.google.com/)
+2. Enable the **Gmail API** (APIs & Services → Library)
+3. Configure the **OAuth consent screen** — set type to External, add your email as a test user
+4. Create an OAuth client ID: Credentials → Create Credentials → OAuth client ID → **Android**
+   - Package name: `com.autorelay.app`
+   - SHA-1: run `keytool -keystore ~/.android/debug.keystore -list -v -storepass android` and copy the SHA-1
+
+No client secret or config file needed — Android OAuth is verified by package name + signing certificate at runtime.
 
 ### Via Command Line
 
@@ -58,41 +59,30 @@ brew install --cask temurin
 # Build and install on a connected device
 ./gradlew installDebug
 
-# Launch the app
-adb shell am start -n com.autorelay.app/.MainActivity
-```
-
-### Viewing SMS Logs
-
-```sh
+# Stream logs
 adb logcat -s AutoRelay
 ```
 
-### Testing
-
-- To test the SMS path, send a real carrier SMS to the Android device.
-- To test the RCS path, send a message that arrives in Google Messages as RCS and make sure message notifications are enabled.
-- An iPhone-to-Android message may arrive as RCS instead of SMS, so it may only appear through the notification-listener path.
-
 ## Permissions
-
-The app uses the following access:
 
 - `RECEIVE_SMS` — listen for incoming SMS
 - `READ_SMS` — read SMS message content
+- `SEND_SMS` — forward messages via SMS
 - `INTERNET` — send emails via Gmail API
 - Notification access — inspect Google Messages notifications for the RCS fallback
 
-## Current Architecture
+## Architecture
 
-- [SmsReceiver.kt](app/src/main/java/com/autorelay/app/SmsReceiver.kt) processes SMS broadcasts from the telephony stack.
-- [MessageNotificationListenerService.kt](app/src/main/java/com/autorelay/app/MessageNotificationListenerService.kt) processes Google Messages notifications for RCS fallback.
-- [MainActivity.kt](app/src/main/java/com/autorelay/app/MainActivity.kt) manages SMS permission state and notification access status.
+- [`SmsReceiver.kt`](app/src/main/java/com/autorelay/app/receiver/SmsReceiver.kt) — telephony broadcast receiver, reliable path for SMS and most OTPs
+- [`MessageNotificationListenerService.kt`](app/src/main/java/com/autorelay/app/service/MessageNotificationListenerService.kt) — notification listener for RCS fallback; skips redacted notifications
+- [`RelayEngine.kt`](app/src/main/java/com/autorelay/app/engine/RelayEngine.kt) — processes messages, deduplicates, and dispatches forwarding
+- [`GmailProvider.kt`](app/src/main/java/com/autorelay/app/engine/GmailProvider.kt) — sends email via Gmail API using OAuth
 
 ## Roadmap
 
-- [ ] Forward SMS to another phone number
-- [ ] Forward RCS-derived notification messages
-- [x] Forward SMS via email
-- [ ] Configurable forwarding rules
-- [ ] Notification on forward
+- [x] Forward SMS via email (Gmail OAuth)
+- [x] Forward SMS to another phone number
+- [x] RCS fallback via notification listener
+- [x] Deduplicate SMS + RCS for the same message
+- [ ] Configurable forwarding rules (sender filter, keyword match)
+- [ ] Notification on successful forward

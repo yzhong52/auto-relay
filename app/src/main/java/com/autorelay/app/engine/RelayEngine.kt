@@ -15,6 +15,21 @@ import java.util.Locale
  */
 object RelayEngine {
     private const val TAG = "RelayEngine"
+    private const val DEDUP_WINDOW_MS = 30_000L
+    private val recentBodyHashes = mutableListOf<Pair<Int, Long>>()
+
+    @Synchronized
+    private fun isDuplicate(body: String): Boolean {
+        val now = System.currentTimeMillis()
+        val hash = body.trim().hashCode()
+        recentBodyHashes.removeAll { now - it.second > DEDUP_WINDOW_MS }
+        return if (recentBodyHashes.any { it.first == hash }) {
+            true
+        } else {
+            recentBodyHashes.add(hash to now)
+            false
+        }
+    }
 
     fun processIncomingMessage(
         context: Context,
@@ -26,6 +41,11 @@ object RelayEngine {
         val actions = mutableListOf<String>()
 
         Thread {
+            if (isDuplicate(body)) {
+                Log.d(TAG, "Duplicate message detected — already processed via another path, skipping")
+                return@Thread
+            }
+
             if (config.emailForwardEnabled) {
                 if (config.destinationEmail.isBlank()) {
                     actions.add(context.getString(R.string.action_no_email))
