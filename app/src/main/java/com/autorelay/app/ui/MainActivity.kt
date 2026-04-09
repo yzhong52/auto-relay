@@ -2,6 +2,7 @@ package com.autorelay.app.ui
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -44,6 +45,17 @@ class MainActivity : AppCompatActivity() {
             binding.containerPermissions.visibility =
                 if (supportFragmentManager.backStackEntryCount > 0) View.VISIBLE else View.GONE
         }
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (supportFragmentManager.backStackEntryCount > 0) {
+                    supportFragmentManager.popBackStack()
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
+            }
+        })
     }
 
     fun openPermissions() {
@@ -52,15 +64,5 @@ class MainActivity : AppCompatActivity() {
             .replace(R.id.containerPermissions, PermissionsFragment())
             .addToBackStack(null)
             .commit()
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        if (supportFragmentManager.backStackEntryCount > 0) {
-            supportFragmentManager.popBackStack()
-        } else {
-            @Suppress("DEPRECATION")
-            super.onBackPressed()
-        }
     }
 }
