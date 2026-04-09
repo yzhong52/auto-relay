@@ -63,9 +63,14 @@ object GmailProvider {
     }
 
     private fun buildRawMessage(from: String, to: String, subject: String, body: String): Message {
-        val mime = "From: $from\r\nTo: $to\r\nSubject: $subject\r\n" +
+        val mime = "From: $from\r\nTo: $to\r\nSubject: ${encodeMimeHeader(subject)}\r\n" +
                 "MIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n$body"
         val encoded = Base64.encodeToString(mime.toByteArray(Charsets.UTF_8), Base64.URL_SAFE or Base64.NO_WRAP)
         return Message().apply { raw = encoded }
     }
+
+    private fun encodeMimeHeader(value: String): String =
+        if (value.any { it.code > 127 }) {
+            "=?UTF-8?B?${Base64.encodeToString(value.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)}?="
+        } else value
 }
