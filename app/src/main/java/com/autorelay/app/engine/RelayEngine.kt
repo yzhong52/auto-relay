@@ -25,44 +25,44 @@ object RelayEngine {
         val config = RelayConfig(context)
         val actions = mutableListOf<String>()
 
-        if (config.emailForwardEnabled) {
-            if (config.destinationEmail.isNotBlank()) {
-                actions.add(context.getString(R.string.action_forwarded, config.destinationEmail))
-            } else {
-                actions.add(context.getString(R.string.action_no_email))
-            }
-        }
-
-        if (config.smsForwardEnabled) {
-            if (config.destinationPhoneNumber.isNotBlank()) {
-                val displayPhone = PhoneNumberUtils.formatNumber(config.destinationPhoneNumber, Locale.getDefault().country)
-                    ?: config.destinationPhoneNumber
-                actions.add(context.getString(R.string.action_sms_forwarded, displayPhone))
-            } else {
-                actions.add(context.getString(R.string.action_no_phone))
-            }
-        }
-
-        if (actions.isEmpty()) {
-            actions.add(context.getString(R.string.action_relay_disabled))
-        }
-
-        // Add the initial log entry
-        RelayLog.add(
-            sender = sender,
-            message = body,
-            source = source,
-            actions = actions
-        )
-
-        // Execute background tasks
         Thread {
-            if (config.emailForwardEnabled && config.destinationEmail.isNotBlank()) {
-                forwardToEmail(context, config.destinationEmail, sender, body)
+            if (config.emailForwardEnabled) {
+                if (config.destinationEmail.isBlank()) {
+                    actions.add(context.getString(R.string.action_no_email))
+                } else {
+                    val success = forwardToEmail(context, config.destinationEmail, sender, body)
+                    actions.add(
+                        if (success) context.getString(R.string.action_forwarded, config.destinationEmail)
+                        else context.getString(R.string.action_email_failed)
+                    )
+                }
             }
-            if (config.smsForwardEnabled && config.destinationPhoneNumber.isNotBlank()) {
-                forwardToSms(context, config.destinationPhoneNumber, sender, body)
+
+            if (config.smsForwardEnabled) {
+                if (config.destinationPhoneNumber.isBlank()) {
+                    actions.add(context.getString(R.string.action_no_phone))
+                } else {
+                    val success = forwardToSms(context, config.destinationPhoneNumber, sender, body)
+                    if (success) {
+                        val displayPhone = PhoneNumberUtils.formatNumber(config.destinationPhoneNumber, Locale.getDefault().country)
+                            ?: config.destinationPhoneNumber
+                        actions.add(context.getString(R.string.action_sms_forwarded, displayPhone))
+                    } else {
+                        actions.add(context.getString(R.string.action_sms_failed))
+                    }
+                }
             }
+
+            if (actions.isEmpty()) {
+                actions.add(context.getString(R.string.action_relay_disabled))
+            }
+
+            RelayLog.add(
+                sender = sender,
+                message = body,
+                source = source,
+                actions = actions
+            )
         }.start()
 
         return actions

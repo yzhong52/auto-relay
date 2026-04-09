@@ -62,6 +62,8 @@
     <string name="action_relay_disabled">Relay disabled — message not forwarded</string>
     <string name="action_no_email">No destination email configured</string>
     <string name="action_forwarded">Forwarded to %s</string>
+    <string name="action_email_failed">Email forward failed — check network or sign-in</string>
     <string name="action_no_phone">No destination phone configured</string>
     <string name="action_sms_forwarded">SMS forwarded to %s</string>
+    <string name="action_sms_failed">SMS forward failed</string>
 </resources>
