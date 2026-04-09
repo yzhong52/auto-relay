@@ -36,8 +36,8 @@ class MessageNotificationListenerService : NotificationListenerService() {
         val title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()?.trim().orEmpty()
         val text = extractMessageText(extras)
 
-        if (text.isBlank()) {
-            Log.d(TAG, "Ignoring Google Messages notification without message text")
+        if (text.isBlank() || title.isBlank()) {
+            Log.d(TAG, "Ignoring Google Messages notification without message text or title")
             return
         }
 
