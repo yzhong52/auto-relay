@@ -16,7 +16,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import com.autorelay.app.BuildConfig
 import com.autorelay.app.R
 import com.autorelay.app.data.LogEntry
 import com.autorelay.app.data.RelayConfig
