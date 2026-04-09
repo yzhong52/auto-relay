@@ -1,4 +1,4 @@
-package com.autorelay.app
+package com.autorelay.app.data
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

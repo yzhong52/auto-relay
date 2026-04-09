@@ -24,8 +24,25 @@ Requires a JDK (`brew install --cask temurin`) or use Android Studio which bundl
 ```
 app/src/main/
   java/com/autorelay/app/
-    MainActivity.kt     # entry point, runtime permission request
-    SmsReceiver.kt      # BroadcastReceiver for incoming SMS
+    ui/                  # Activities, Fragments, Adapters
+      MainActivity.kt
+      MainPagerAdapter.kt
+      ConfigFragment.kt
+      PermissionsFragment.kt
+      LogFragment.kt
+      LogAdapter.kt
+    data/                # Models and storage
+      LogEntry.kt
+      RelayConfig.kt
+      RelayLog.kt
+    engine/              # Business logic
+      RelayEngine.kt
+    receiver/            # BroadcastReceivers
+      SmsReceiver.kt
+    service/             # Background services
+      MessageNotificationListenerService.kt
+    util/                # Shared utilities
+      PermissionUtils.kt
   res/
     layout/activity_main.xml
     values/strings.xml, themes.xml, colors.xml

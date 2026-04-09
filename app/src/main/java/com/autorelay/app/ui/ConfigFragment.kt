@@ -1,4 +1,4 @@
-package com.autorelay.app
+package com.autorelay.app.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -16,7 +16,13 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import com.autorelay.app.R
+import com.autorelay.app.data.LogEntry
+import com.autorelay.app.data.RelayConfig
 import com.autorelay.app.databinding.FragmentConfigBinding
+import com.autorelay.app.engine.RelayEngine
+import com.autorelay.app.util.hasNotificationListenerAccess
+import com.autorelay.app.util.hasSmsPermissions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -91,7 +97,6 @@ class ConfigFragment : Fragment() {
         updateStatusCard()
         updateRelayUi()
 
-        // Auto-navigate to permissions on first launch if anything is missing
         if (savedInstanceState == null && !allPermissionsGranted()) {
             openPermissions()
         }
@@ -127,7 +132,7 @@ class ConfigFragment : Fragment() {
 
         dialog.setOnShowListener {
             val saveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            
+
             val validate = {
                 val email = editText.text.toString().trim()
                 val isValid = email.isEmpty() || android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
@@ -136,7 +141,7 @@ class ConfigFragment : Fragment() {
             }
 
             editText.doAfterTextChanged { validate() }
-            
+
             saveButton.setOnClickListener {
                 val email = editText.text.toString().trim()
                 config.destinationEmail = email
@@ -145,7 +150,7 @@ class ConfigFragment : Fragment() {
                 updateRelayUi()
                 dialog.dismiss()
             }
-            
+
             validate()
             editText.requestFocus()
             dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
@@ -171,22 +176,19 @@ class ConfigFragment : Fragment() {
 
         dialog.setOnShowListener {
             val saveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            
-            // Modern formatting logic using PhoneNumberUtils
+
             var isFormatting = false
             editText.doAfterTextChanged { s ->
                 if (isFormatting) return@doAfterTextChanged
-                
+
                 val input = s.toString()
                 val countryCode = Locale.getDefault().country.ifBlank { "US" }
                 val formatted = PhoneNumberUtils.formatNumber(input, countryCode)
-                
+
                 if (formatted != null && formatted != input) {
                     isFormatting = true
                     val selectionStart = editText.selectionStart
                     editText.setText(formatted)
-                    
-                    // Simple cursor preservation: if we were at the end, stay at the end
                     if (selectionStart == input.length) {
                         editText.setSelection(formatted.length)
                     } else {
@@ -194,8 +196,7 @@ class ConfigFragment : Fragment() {
                     }
                     isFormatting = false
                 }
-                
-                // Validation
+
                 val phone = s.toString().trim()
                 val isValid = phone.isEmpty() || android.util.Patterns.PHONE.matcher(phone).matches()
                 inputLayout.error = if (isValid) null else getString(R.string.error_invalid_phone)
@@ -210,12 +211,9 @@ class ConfigFragment : Fragment() {
                 updateRelayUi()
                 dialog.dismiss()
             }
-            
-            // Initial validation and keyboard show
-            val initialPhone = editText.text.toString().trim()
-            val initialValid = initialPhone.isEmpty() || android.util.Patterns.PHONE.matcher(initialPhone).matches()
-            saveButton.isEnabled = initialValid
 
+            val initialPhone = editText.text.toString().trim()
+            saveButton.isEnabled = initialPhone.isEmpty() || android.util.Patterns.PHONE.matcher(initialPhone).matches()
             editText.requestFocus()
             dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         }
@@ -247,7 +245,7 @@ class ConfigFragment : Fragment() {
         }
 
         inputLayout.addView(editText)
-        
+
         val container = FrameLayout(context).apply {
             addView(inputLayout, layoutParams)
         }

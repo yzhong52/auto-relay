@@ -1,9 +1,13 @@
-package com.autorelay.app
+package com.autorelay.app.engine
 
 import android.content.Context
 import android.telephony.PhoneNumberUtils
 import android.telephony.SmsManager
 import android.util.Log
+import com.autorelay.app.R
+import com.autorelay.app.data.LogEntry
+import com.autorelay.app.data.RelayConfig
+import com.autorelay.app.data.RelayLog
 import java.util.Locale
 
 /**
@@ -12,9 +16,6 @@ import java.util.Locale
 object RelayEngine {
     private const val TAG = "RelayEngine"
 
-    /**
-     * Resolves which actions should be taken for an incoming message and executes them.
-     */
     fun processIncomingMessage(
         context: Context,
         sender: String,
@@ -56,7 +57,6 @@ object RelayEngine {
             actions.add(context.getString(R.string.action_relay_disabled))
         }
 
-        // Add to log
         RelayLog.add(
             sender = sender,
             message = body,

@@ -1,4 +1,4 @@
-package com.autorelay.app
+package com.autorelay.app.ui
 
 import android.Manifest
 import android.content.Intent
@@ -10,7 +10,10 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.autorelay.app.R
 import com.autorelay.app.databinding.FragmentPermissionsBinding
+import com.autorelay.app.util.hasNotificationListenerAccess
+import com.autorelay.app.util.hasSmsPermissions
 
 class PermissionsFragment : Fragment() {
 

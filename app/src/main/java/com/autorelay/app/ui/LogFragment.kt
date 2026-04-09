@@ -1,4 +1,4 @@
-package com.autorelay.app
+package com.autorelay.app.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.autorelay.app.data.RelayLog
 import com.autorelay.app.databinding.FragmentLogBinding
 
 class LogFragment : Fragment() {

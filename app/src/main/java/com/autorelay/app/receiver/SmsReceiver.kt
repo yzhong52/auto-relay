@@ -1,4 +1,4 @@
-package com.autorelay.app
+package com.autorelay.app.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -6,6 +6,8 @@ import android.content.Intent
 import android.provider.Telephony
 import android.telephony.SmsMessage
 import android.util.Log
+import com.autorelay.app.data.LogEntry
+import com.autorelay.app.engine.RelayEngine
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -40,7 +42,6 @@ class SmsReceiver : BroadcastReceiver() {
             return
         }
 
-        // Group multi-part messages by sender
         val messageMap = mutableMapOf<String, StringBuilder>()
         var lastTimestamp = 0L
 

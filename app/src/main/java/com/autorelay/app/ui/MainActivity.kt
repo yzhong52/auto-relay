@@ -1,4 +1,4 @@
-package com.autorelay.app
+package com.autorelay.app.ui
 
 import android.os.Bundle
 import android.view.View
@@ -6,6 +6,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.autorelay.app.R
 import com.autorelay.app.databinding.ActivityMainBinding
 import com.google.android.material.tabs.TabLayoutMediator
 

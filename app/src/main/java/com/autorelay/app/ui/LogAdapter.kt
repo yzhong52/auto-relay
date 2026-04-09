@@ -1,10 +1,12 @@
-package com.autorelay.app
+package com.autorelay.app.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.autorelay.app.R
+import com.autorelay.app.data.LogEntry
 import com.autorelay.app.databinding.ItemLogEntryBinding
 import java.text.SimpleDateFormat
 import java.util.Date

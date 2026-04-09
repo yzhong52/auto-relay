@@ -1,4 +1,4 @@
-package com.autorelay.app
+package com.autorelay.app.data
 
 data class LogEntry(
     val id: Long,
