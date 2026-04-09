@@ -1,8 +1,10 @@
 package com.autorelay.app
 
 import android.content.Context
+import android.telephony.PhoneNumberUtils
 import android.telephony.SmsManager
 import android.util.Log
+import java.util.Locale
 
 /**
  * Handles the actual execution of relaying messages.
@@ -41,7 +43,9 @@ object RelayEngine {
             } else {
                 val success = forwardToSms(context, config.destinationPhone, sender, body)
                 if (success) {
-                    actions.add(context.getString(R.string.action_sms_forwarded, config.destinationPhone))
+                    val displayPhone = PhoneNumberUtils.formatNumber(config.destinationPhone, Locale.getDefault().country)
+                        ?: config.destinationPhone
+                    actions.add(context.getString(R.string.action_sms_forwarded, displayPhone))
                 } else {
                     actions.add("SMS relay failed")
                 }
