@@ -1,6 +1,7 @@
 package com.autorelay.app.ui
 
 import android.Manifest
+import android.util.Log
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.telephony.PhoneNumberUtils
@@ -60,7 +61,12 @@ class ConfigFragment : Fragment() {
                     updateRelayUi()
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.w("AutoRelay", "Google Sign-In failed", e)
+                _binding?.let {
+                    com.google.android.material.snackbar.Snackbar
+                        .make(it.root, R.string.error_sign_in_failed, com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
+                        .show()
+                }
             }
         }
 
