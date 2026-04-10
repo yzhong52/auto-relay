@@ -53,6 +53,13 @@ object RelayLog {
         saveToDisk()
     }
 
+    // Re-posts the current list to trigger observer re-evaluation without any data change.
+    // Used when a display filter (e.g. hide unknown senders) is toggled so the UI updates immediately.
+    @Synchronized
+    fun refresh() {
+        _entries.postValue(entriesList.toList())
+    }
+
     @Synchronized
     private fun loadFromDisk() {
         val file = File(appContext.filesDir, FILE_NAME)

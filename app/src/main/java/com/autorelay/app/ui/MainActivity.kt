@@ -99,6 +99,7 @@ class MainActivity : AppCompatActivity() {
                 val config = RelayConfig(this)
                 config.hideUnknownSender = !item.isChecked
                 item.isChecked = config.hideUnknownSender
+                RelayLog.refresh()
                 true
             }
             else -> super.onOptionsItemSelected(item)
