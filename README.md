@@ -2,6 +2,12 @@
 
 An Android app that listens to incoming messages and forwards them to another number or email.
 
+## Screenshots
+
+| Setup | Activity |
+|-------|----------|
+| ![Setup screen](screenshots/screenshot_20260409-214609.png) | ![Activity screen](screenshots/screenshot_20260409-214614.png) |
+
 ## Why
 
 If you use a secondary Android device (or a SIM you don't carry), important messages — OTP codes, 2FA prompts, bank alerts — get stranded on that device. Auto Relay forwards them to wherever you actually are, in real time, so you never miss a verification code because it landed on the wrong phone.
