@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_test_relay"
+        android:title="@string/btn_test_relay"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_clear_log"
+        android:title="@string/menu_clear_log"
+        app:showAsAction="never" />
+
+</menu>

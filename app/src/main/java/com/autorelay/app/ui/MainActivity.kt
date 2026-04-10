@@ -1,6 +1,8 @@
 package com.autorelay.app.ui
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
@@ -8,7 +10,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.autorelay.app.R
+import com.autorelay.app.data.LogEntry
+import com.autorelay.app.data.RelayLog
 import com.autorelay.app.databinding.ActivityMainBinding
+import com.autorelay.app.engine.RelayEngine
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
@@ -30,6 +37,8 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        setSupportActionBar(binding.toolbar)
 
         binding.viewPager.adapter = MainPagerAdapter(this)
 
@@ -56,6 +65,35 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_test_relay -> {
+                RelayEngine.processIncomingMessage(
+                    this, "Test Sender",
+                    getString(R.string.test_relay_body),
+                    LogEntry.Source.SMS
+                )
+                Snackbar.make(binding.main, R.string.test_relay_initiated, Snackbar.LENGTH_SHORT).show()
+                true
+            }
+            R.id.action_clear_log -> {
+                MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.menu_clear_log)
+                    .setMessage(R.string.dialog_clear_log_message)
+                    .setPositiveButton(R.string.clear) { _, _ -> RelayLog.clear() }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     fun openPermissions() {

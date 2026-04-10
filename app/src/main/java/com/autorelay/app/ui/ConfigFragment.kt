@@ -18,10 +18,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import com.autorelay.app.R
-import com.autorelay.app.data.LogEntry
 import com.autorelay.app.data.RelayConfig
 import com.autorelay.app.databinding.FragmentConfigBinding
-import com.autorelay.app.engine.RelayEngine
 import com.autorelay.app.util.hasNotificationListenerAccess
 import com.autorelay.app.util.hasSmsPermissions
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -120,12 +118,6 @@ class ConfigFragment : Fragment() {
             } else {
                 signOutGoogle()
             }
-        }
-
-        binding.btnTestRelay.setOnClickListener {
-            val body = getString(R.string.test_relay_body)
-            RelayEngine.processIncomingMessage(requireContext(), "Test Sender", body, LogEntry.Source.SMS)
-            com.google.android.material.snackbar.Snackbar.make(binding.root, R.string.test_relay_initiated, com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show()
         }
 
         updateStatusCard()

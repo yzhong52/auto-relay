@@ -47,6 +47,13 @@ object RelayLog {
     }
 
     @Synchronized
+    fun clear() {
+        entriesList.clear()
+        _entries.postValue(emptyList())
+        saveToDisk()
+    }
+
+    @Synchronized
     private fun loadFromDisk() {
         val file = File(appContext.filesDir, FILE_NAME)
         if (!file.exists()) return
