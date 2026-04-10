@@ -32,7 +32,7 @@
     <string name="grant">Grant</string>
 
     <!-- Config: relay settings -->
-    <string name="label_forward_to_email">Gmail forwarding (OAuth2)</string>
+    <string name="label_forward_to_email">Gmail forwarding</string>
     <string name="label_google_account">Google Account</string>
     <string name="btn_google_sign_in">Sign in with Google</string>
     <string name="btn_google_sign_out">Sign out</string>

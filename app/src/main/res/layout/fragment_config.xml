@@ -116,31 +116,13 @@
 
                     </LinearLayout>
 
-                    <!-- Google Sign-in area -->
-                    <LinearLayout
-                        android:id="@+id/layoutGoogleAuth"
+                    <TextView
+                        android:id="@+id/tvGoogleAccountStatus"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/tvGoogleAccountStatus"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textAppearance="?attr/textAppearanceCaption"
-                            android:textColor="?attr/colorPrimary" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnGoogleAuth"
-                            style="@style/Widget.MaterialComponents.Button.TextButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/btn_google_sign_in"
-                            android:textSize="12sp" />
-                    </LinearLayout>
+                        android:layout_marginTop="2dp"
+                        android:textAppearance="?attr/textAppearanceCaption"
+                        android:textColor="?attr/colorPrimary" />
                 </LinearLayout>
 
                 <!-- Divider -->

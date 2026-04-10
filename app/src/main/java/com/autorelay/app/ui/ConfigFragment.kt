@@ -91,7 +91,9 @@ class ConfigFragment : Fragment() {
                 updateRelayUi()
             }
         }
-        binding.layoutEmailConfig.setOnClickListener { startGoogleSignIn() }
+        binding.layoutEmailConfig.setOnClickListener {
+            if (config.googleAccountEmail.isBlank()) startGoogleSignIn() else signOutGoogle()
+        }
 
         binding.switchSmsEnabled.isChecked = config.smsForwardEnabled
         binding.switchSmsEnabled.setOnCheckedChangeListener { _, checked ->
@@ -111,14 +113,6 @@ class ConfigFragment : Fragment() {
             updateRelayUi()
         }
         binding.layoutSmsConfig.setOnClickListener { showPhoneDialog() }
-
-        binding.btnGoogleAuth.setOnClickListener {
-            if (config.googleAccountEmail.isBlank()) {
-                startGoogleSignIn()
-            } else {
-                signOutGoogle()
-            }
-        }
 
         updateStatusCard()
         updateRelayUi()
@@ -280,10 +274,8 @@ class ConfigFragment : Fragment() {
 
         if (config.googleAccountEmail.isNotBlank()) {
             binding.tvGoogleAccountStatus.text = getString(R.string.google_account_linked, config.googleAccountEmail)
-            binding.btnGoogleAuth.text = getString(R.string.btn_google_sign_out)
         } else {
             binding.tvGoogleAccountStatus.text = getString(R.string.google_sign_in_required)
-            binding.btnGoogleAuth.text = getString(R.string.btn_google_sign_in)
         }
 
         binding.layoutEmailConfig.alpha = if (emailEnabled) 1f else 0.7f
