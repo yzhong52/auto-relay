@@ -51,7 +51,7 @@ object RelayEngine {
             }
 
             if (sender.isBlank()) {
-                RelayLog.add("Unknown", body, source, listOf(context.getString(R.string.action_skipped_unknown_sender)))
+                RelayLog.add(LogEntry.UNKNOWN_SENDER, body, source, listOf(context.getString(R.string.action_skipped_unknown_sender)))
                 return@Thread
             }
 

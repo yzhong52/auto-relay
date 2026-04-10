@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.autorelay.app.R
 import com.autorelay.app.data.LogEntry
+import com.autorelay.app.data.RelayConfig
 import com.autorelay.app.data.RelayLog
 import com.autorelay.app.databinding.ActivityMainBinding
 import com.autorelay.app.engine.RelayEngine
@@ -69,6 +70,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
+        val config = RelayConfig(this)
+        menu.findItem(R.id.action_hide_unknown_sender)?.isChecked = config.hideUnknownSender
         return true
     }
 
@@ -90,6 +93,12 @@ class MainActivity : AppCompatActivity() {
                     .setPositiveButton(R.string.clear) { _, _ -> RelayLog.clear() }
                     .setNegativeButton(android.R.string.cancel, null)
                     .show()
+                true
+            }
+            R.id.action_hide_unknown_sender -> {
+                val config = RelayConfig(this)
+                config.hideUnknownSender = !item.isChecked
+                item.isChecked = config.hideUnknownSender
                 true
             }
             else -> super.onOptionsItemSelected(item)

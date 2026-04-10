@@ -12,4 +12,10 @@
         android:title="@string/menu_clear_log"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_hide_unknown_sender"
+        android:title="@string/menu_hide_unknown_sender"
+        android:checkable="true"
+        app:showAsAction="never" />
+
 </menu>

@@ -22,10 +22,15 @@ class RelayConfig(context: Context) {
         get() = prefs.getString(KEY_GOOGLE_ACCOUNT, "") ?: ""
         set(value) { prefs.edit { putString(KEY_GOOGLE_ACCOUNT, value) } }
 
+    var hideUnknownSender: Boolean
+        get() = prefs.getBoolean(KEY_HIDE_UNKNOWN_SENDER, true)
+        set(value) { prefs.edit { putBoolean(KEY_HIDE_UNKNOWN_SENDER, value) } }
+
     companion object {
         private const val KEY_EMAIL_FORWARD_ENABLED = "email_forward_enabled"
         private const val KEY_SMS_ENABLED = "sms_forward_enabled"
         private const val KEY_PHONE = "destination_phone_number"
         private const val KEY_GOOGLE_ACCOUNT = "google_account_email"
+        private const val KEY_HIDE_UNKNOWN_SENDER = "hide_unknown_sender"
     }
 }

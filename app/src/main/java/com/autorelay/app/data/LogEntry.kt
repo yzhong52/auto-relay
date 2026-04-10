@@ -9,4 +9,8 @@ data class LogEntry(
     val actions: List<String>
 ) {
     enum class Source { SMS, RCS }
+
+    companion object {
+        const val UNKNOWN_SENDER = "Unknown"
+    }
 }

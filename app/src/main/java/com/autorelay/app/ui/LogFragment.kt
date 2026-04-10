@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.autorelay.app.data.LogEntry
+import com.autorelay.app.data.RelayConfig
 import com.autorelay.app.data.RelayLog
 import com.autorelay.app.databinding.FragmentLogBinding
 
@@ -29,8 +31,14 @@ class LogFragment : Fragment() {
         binding.rvLog.adapter = adapter
 
         RelayLog.entries.observe(viewLifecycleOwner) { entries ->
-            adapter.submitList(entries)
-            binding.tvEmptyLog.visibility = if (entries.isEmpty()) View.VISIBLE else View.GONE
+            val config = RelayConfig(requireContext())
+            val visible = if (config.hideUnknownSender) {
+                entries.filter { it.sender != LogEntry.UNKNOWN_SENDER }
+            } else {
+                entries
+            }
+            adapter.submitList(visible)
+            binding.tvEmptyLog.visibility = if (visible.isEmpty()) View.VISIBLE else View.GONE
         }
     }
 
