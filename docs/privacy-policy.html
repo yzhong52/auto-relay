@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Auto Relay</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 720px; margin: 48px auto; padding: 0 24px; color: #222; line-height: 1.6; }
+    h1 { font-size: 1.6rem; }
+    h2 { font-size: 1.1rem; margin-top: 2rem; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+    th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+    th { background: #f5f5f5; }
+    a { color: #1a73e8; }
+    .meta { color: #666; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+
+<h1>Privacy Policy for Auto Relay</h1>
+<p class="meta">Last updated: April 12, 2026</p>
+
+<h2>Overview</h2>
+<p>Auto Relay is a message forwarding app. It reads incoming SMS messages on your device and forwards them to a destination you configure — either your Gmail account or another phone number. The app does not operate any servers and does not transmit your data to the developer.</p>
+
+<h2>Data Collected</h2>
+<table>
+  <thead>
+    <tr><th>Data</th><th>Purpose</th><th>Retention</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>SMS message content</td><td>Forwarding to your configured destination</td><td>In-app log, 14 days</td></tr>
+    <tr><td>SMS sender (phone number or name)</td><td>Included in forwarded message</td><td>In-app log, 14 days</td></tr>
+    <tr><td>Google account (email address)</td><td>Identify forwarding destination</td><td>Stored locally on device</td></tr>
+  </tbody>
+</table>
+<p>No data is collected by the developer. All data stays on your device or is sent directly to your own Gmail account.</p>
+
+<h2>Google API and Gmail</h2>
+<p>Auto Relay uses the Gmail API solely to send forwarded messages to your own Gmail account. The app's use of Gmail API data:</p>
+<ul>
+  <li>Is limited to sending email on your behalf to your own account</li>
+  <li>Is not used for advertising or any purpose unrelated to forwarding</li>
+  <li>Is not transferred to third parties</li>
+  <li>Complies with the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements</li>
+</ul>
+
+<h2>Permissions</h2>
+<ul>
+  <li><code>RECEIVE_SMS</code> / <code>READ_SMS</code> — read incoming SMS messages for forwarding</li>
+  <li><code>SEND_SMS</code> — forward messages to another phone number (if configured)</li>
+  <li><code>INTERNET</code> — send emails via Gmail API</li>
+  <li>Notification access — detect incoming RCS messages via Google Messages notifications</li>
+</ul>
+
+<h2>Data Sharing</h2>
+<p>Your message data is forwarded only to the destination you configure. It is never sent to the developer or any third party.</p>
+
+<h2>Data Deletion</h2>
+<p>You can clear the in-app activity log at any time via the overflow menu. Revoking SMS permissions or notification access stops the app from processing new messages. You can revoke Gmail access at any time via your Google account settings at <a href="https://myaccount.google.com">myaccount.google.com</a>.</p>
+
+<h2>Contact</h2>
+<p>For questions about this privacy policy, contact: <a href="mailto:auto-relay-testing@googlegroups.com">auto-relay-testing@googlegroups.com</a></p>
+
+</body>
+</html>

@@ -46,15 +46,22 @@ Open the project in Android Studio. It will sync Gradle and download dependencie
 ### Via Command Line
 
 ```sh
-# Install a JDK if needed
-brew install --cask temurin
-
 # Build and install on a connected device
 ./gradlew installDebug
+
+# Generate a release APK
+./gradlew :app:assembleRelease
+
+# Generate a release App Bundle (AAB) for Play Store
+./gradlew :app:bundleRelease
 
 # Stream logs
 adb logcat -s AutoRelay
 ```
+
+## Publishing to Google Play
+
+For detailed instructions on signing, building, and submitting to the Play Store, see [RELEASE.md](RELEASE.md).
 
 ## Configuring Gmail Email Forwarding
 

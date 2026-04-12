@@ -28,6 +28,8 @@ build/
 # Key files
 *.jks
 *.keystore
+keystore/
+keystore.properties
 
 # Google Services
 google-services.json
