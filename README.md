@@ -21,16 +21,6 @@ Email forwarding also unlocks agentic workflows: an AI agent monitoring an inbox
 - Deduplicates messages that arrive via both SMS and RCS notification
 - Logs all received messages and forwarding outcomes in-app
 
-## RCS Limitations
-
-Android has no public API for third-party apps to receive RCS messages directly. The RCS path works by listening to Google Messages notifications, which has two important limitations:
-
-1. **Sensitive notifications are redacted.** Android allows apps to mark notifications as sensitive, and Google Messages does this for OTPs, verification codes, and bank alerts — exactly the messages you care about. These arrive with the content replaced by "Sensitive notification content hidden" and the sender replaced by "Unknown". Auto Relay detects and discards these silently.
-
-2. **Duplicates with SMS.** Many carriers deliver the same message over both SMS and RCS. When this happens, Auto Relay receives it twice — once via the telephony broadcast and once via the notification. The deduplication logic suppresses the second arrival within a 30-second window.
-
-**In practice:** the SMS path is reliable for OTPs and bank codes. The RCS path adds coverage for messages that arrive only as RCS (e.g. some iMessage-to-Android flows) but will miss sensitive ones.
-
 ## Requirements
 
 - Android 8.0+ (API 26+)
