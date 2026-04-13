@@ -39,11 +39,7 @@ Android has no public API for third-party apps to receive RCS messages directly.
 
 ## Build & Run
 
-### Via Android Studio
-
-Open the project in Android Studio. It will sync Gradle and download dependencies automatically. Connect a device or start an emulator, then click **Run**.
-
-### Via Command Line
+Open & build the project in Android Studio, or use the command line:
 
 ```sh
 # Build and install on a connected device
@@ -59,22 +55,11 @@ Open the project in Android Studio. It will sync Gradle and download dependencie
 adb logcat -s AutoRelay
 ```
 
-## Publishing to Google Play
+For Gmail email forwarding setup, see [Configuring Gmail Email Forwarding](faq/configuring-gmail-email-forwarding.md).
 
-For detailed instructions on signing, building, and submitting to the Play Store, see [RELEASE.md](RELEASE.md).
+## Beta Testing
 
-## Configuring Gmail Email Forwarding
-
-Email forwarding requires a one-time Google Cloud setup:
-
-1. Create a project in the [Google Cloud Console](https://console.cloud.google.com/)
-2. Enable the **Gmail API** (APIs & Services → Library)
-3. Configure the **OAuth consent screen** — set type to External, add your email as a test user
-4. Create an OAuth client ID: Credentials → Create Credentials → OAuth client ID → **Android**
-   - Package name: `com.autorelay.app`
-   - SHA-1: run `keytool -keystore ~/.android/debug.keystore -list -v -storepass android` and copy the SHA-1
-
-No client secret or config file needed — Android OAuth is verified by package name + signing certificate at runtime.
+To join the beta, request access via the Google group: [auto-relay-testing](https://groups.google.com/g/auto-relay-testing).
 
 ## Permissions
 

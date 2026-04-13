@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 108 108">
+  <!-- Background -->
+  <rect width="108" height="108" fill="#00796B"/>
+  <circle cx="54" cy="54" r="50" fill="#00897B"/>
+  <circle cx="54" cy="54" r="30" fill="#009688"/>
+
+  <!-- Outer Ring -->
+  <circle cx="54" cy="54" r="40" fill="#FFFFFF" fill-opacity="0.1" stroke="#FFFFFF" stroke-width="2"/>
+
+  <!-- Relay arrows -->
+  <path fill="#FFFFFF" d="M54,34c-11.05,0 -20,8.95 -20,20h4c0,-8.84 7.16,-16 16,-16s16,7.16 16,16c0,4.42 -1.79,8.42 -4.69,11.31l2.83,2.83C76.01,64.27 78,59.37 78,54c0,-13.25 -10.75,-24 -24,-24z"/>
+  <path fill="#FFFFFF" d="M54,74c11.05,0 20,-8.95 20,-20h-4c0,8.84 -7.16,16 -16,16s-16,-7.16 -16,-16c0,-4.42 1.79,-8.42 4.69,-11.31l-2.83,-2.83C31.99,43.73 30,48.63 30,54c0,13.25 10.75,24 24,24z"/>
+
+  <!-- Arrow heads -->
+  <path fill="#FFFFFF" d="M34,54l-4,-4l-4,4z"/>
+  <path fill="#FFFFFF" d="M74,54l4,4l4,-4z"/>
+
+  <!-- Central dot -->
+  <circle cx="54" cy="54" r="6" fill="#FFFFFF"/>
+</svg>
