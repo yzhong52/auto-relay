@@ -47,9 +47,14 @@ adb logcat -s AutoRelay
 
 For Gmail email forwarding setup, see [Configuring Gmail Email Forwarding](faq/configuring-gmail-email-forwarding.md).
 
-## Beta Testing
+## Get the App
 
-To join the beta, request access via the Google group: [auto-relay-testing](https://groups.google.com/g/auto-relay-testing).
+To install the pre-built version, join the [auto-relay-testing](https://groups.google.com/g/auto-relay-testing) Google group to get access, then download it:
+
+- **On Android:** [Google Play Store](https://play.google.com/store/apps/details?id=com.autorelay.app)
+- **On the web:** [Play Store testing page](https://play.google.com/apps/testing/com.autorelay.app)
+
+To report an issue, visit the [GitHub issue tracker](https://github.com/yzhong52/auto-relay/issues).
 
 ## Permissions
 
