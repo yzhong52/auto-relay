@@ -52,6 +52,13 @@ app/src/main/
 ## Key Conventions
 
 - All SMS log output uses tag `AutoRelay` via `Log.i("AutoRelay", ...)`
-- `SmsReceiver` is registered in the manifest with `priority="999"` and `exported="true"`
-- Runtime permissions are handled in `MainActivity` using `ActivityResultContracts.RequestMultiplePermissions`
+- `SmsReceiver` is registered in the manifest with `priority="999"` and
+  `exported="true"`
+- Runtime permissions are handled in `MainActivity` using
+  `ActivityResultContracts.RequestMultiplePermissions`
 - Prefer small, focused commits scoped to one logical change
+
+## Markdown
+
+- Wrap all edited lines at 80 characters
+- Exception: lines containing URLs or code spans that cannot be broken
