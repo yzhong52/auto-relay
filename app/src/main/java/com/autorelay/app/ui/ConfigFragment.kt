@@ -116,10 +116,6 @@ class ConfigFragment : Fragment() {
 
         updateStatusCard()
         updateRelayUi()
-
-        if (savedInstanceState == null && !allPermissionsGranted()) {
-            openPermissions()
-        }
     }
 
     override fun onResume() {
