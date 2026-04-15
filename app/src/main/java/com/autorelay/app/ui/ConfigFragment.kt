@@ -230,19 +230,31 @@ class ConfigFragment : Fragment() {
                 PackageManager.PERMISSION_GRANTED
 
     private fun updateStatusCard() {
-        val isActive = allPermissionsGranted()
-        val statusColor = ContextCompat.getColor(requireContext(),
-            if (isActive) R.color.status_active else R.color.status_error)
-        val statusBgColor = ContextCompat.getColor(requireContext(),
-            if (isActive) R.color.status_active_bg else R.color.status_error_bg)
-        binding.cardStatus.setCardBackgroundColor(statusBgColor)
-        binding.ivServiceStatus.setImageResource(
-            if (isActive) R.drawable.ic_status_ok else R.drawable.ic_status_error)
-        binding.tvServiceStatus.text = getString(
-            if (isActive) R.string.status_active else R.string.status_inactive)
+        val hasSms = hasSmsPermissions(requireContext())
+        val hasRcs = hasNotificationListenerAccess(requireContext())
+        val isActive = hasSms && hasRcs
+        val isPartial = hasSms || hasRcs
+
+        val colorRes = if (isActive || isPartial) R.color.status_active else R.color.status_error
+        val bgColorRes = if (isActive || isPartial) R.color.status_active_bg else R.color.status_error_bg
+        val iconRes = if (isActive || isPartial) R.drawable.ic_status_ok else R.drawable.ic_status_error
+        val titleRes = when {
+            isActive || isPartial -> R.string.status_active
+            else -> R.string.status_inactive
+        }
+        val descRes = when {
+            isActive -> R.string.status_active_desc
+            hasSms -> R.string.status_active_sms_only_desc
+            hasRcs -> R.string.status_active_rcs_only_desc
+            else -> R.string.status_inactive_desc
+        }
+
+        val statusColor = ContextCompat.getColor(requireContext(), colorRes)
+        binding.cardStatus.setCardBackgroundColor(ContextCompat.getColor(requireContext(), bgColorRes))
+        binding.ivServiceStatus.setImageResource(iconRes)
+        binding.tvServiceStatus.text = getString(titleRes)
         binding.tvServiceStatus.setTextColor(statusColor)
-        binding.tvServiceStatusDesc.text = getString(
-            if (isActive) R.string.status_active_desc else R.string.status_inactive_desc)
+        binding.tvServiceStatusDesc.text = getString(descRes)
     }
 
     private fun startGoogleSignIn() {
