@@ -102,6 +102,10 @@ class MainActivity : AppCompatActivity() {
                 RelayLog.refresh()
                 true
             }
+            R.id.action_about -> {
+                openAbout()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -110,6 +114,14 @@ class MainActivity : AppCompatActivity() {
         binding.containerPermissions.visibility = View.VISIBLE
         supportFragmentManager.beginTransaction()
             .replace(R.id.containerPermissions, PermissionsFragment())
+            .addToBackStack(null)
+            .commit()
+    }
+
+    private fun openAbout() {
+        binding.containerPermissions.visibility = View.VISIBLE
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.containerPermissions, AboutFragment())
             .addToBackStack(null)
             .commit()
     }
