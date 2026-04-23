@@ -249,6 +249,8 @@ class ConfigFragment : Fragment() {
             else -> R.string.status_inactive_desc
         }
 
+        binding.tvValueProp.visibility = if (isActive || isPartial) View.GONE else View.VISIBLE
+
         val statusColor = ContextCompat.getColor(requireContext(), colorRes)
         binding.cardStatus.setCardBackgroundColor(ContextCompat.getColor(requireContext(), bgColorRes))
         binding.ivServiceStatus.setImageResource(iconRes)

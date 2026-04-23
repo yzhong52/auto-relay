@@ -11,6 +11,17 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Value prop shown before permissions are granted -->
+        <TextView
+            android:id="@+id/tvValueProp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/value_prop"
+            android:textAlignment="center"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:visibility="gone" />
+
         <!-- Overall Service Status -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardStatus"
