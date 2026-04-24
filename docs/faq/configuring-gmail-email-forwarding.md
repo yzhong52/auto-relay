@@ -3,6 +3,8 @@ layout: default
 title: Configuring Gmail Email Forwarding
 ---
 
+# Configuring Gmail Email Forwarding
+
 Email forwarding allows the app to send your messages to your inbox.
 
 If you're using the version from the Play Store, simply **Sign In** with

@@ -3,6 +3,8 @@ layout: default
 title: Setting Up Message Forwarding on iPhone
 ---
 
+# Setting Up Message Forwarding on iPhone
+
 On iOS you don't need a third-party app. The built-in **Shortcuts**
 app has an Automation feature that can forward any incoming message
 to your email automatically.

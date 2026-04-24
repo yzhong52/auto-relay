@@ -3,6 +3,8 @@ layout: default
 title: Why can't Auto Relay forward all RCS messages?
 ---
 
+# Why can't Auto Relay forward all RCS messages?
+
 Android has no public API for third-party apps to receive RCS messages directly. The RCS path works by listening to Google Messages notifications, which has two important limitations:
 
 1. **Sensitive notifications are redacted.** Android allows apps to mark notifications as sensitive, and Google Messages does this for OTPs, verification codes, and bank alerts — exactly the messages you care about. These arrive with the content replaced by "Sensitive notification content hidden". Auto Relay detects and skips these; they still appear in the in-app log as skipped, but are never forwarded.
