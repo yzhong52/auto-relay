@@ -42,6 +42,8 @@ Tap **Next**, then add the **Send Email** action. Configure it:
 ## Result
 
 Every incoming message triggers the automation and sends an email
-with the subject **Auto-Relay**, making it easy to search, filter,
-or pipe into other workflows.
+with the subject **Auto-Relay**.
+
+Now you can leave your phone in the closet — no more picking it up
+just to check a code.
 
