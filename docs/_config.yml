@@ -2,5 +2,4 @@ title: Auto Relay
 description: >-
   An Android app that forwards incoming messages to email or
   another number.
-theme: minima
-header_pages: []
+theme: jekyll-theme-minimal

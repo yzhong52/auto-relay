@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: default
 title: Why does Auto Relay use two message paths instead of one?
 ---
 

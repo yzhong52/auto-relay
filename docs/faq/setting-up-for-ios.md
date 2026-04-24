@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: default
 title: Setting Up Message Forwarding on iPhone
 ---
 

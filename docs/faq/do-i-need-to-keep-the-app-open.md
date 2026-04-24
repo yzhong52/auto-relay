@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: default
 title: Do I need to keep the app open for relaying to work?
 ---
 
