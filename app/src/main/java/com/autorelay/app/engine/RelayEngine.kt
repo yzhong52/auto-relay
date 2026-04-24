@@ -116,7 +116,7 @@ object RelayEngine {
     }
 
     private fun forwardToEmail(context: Context, destination: String, originalSender: String, body: String): Boolean {
-        val subject = "Forwarded message from $originalSender"
+        val subject = "[AutoRelay] Forwarded message from $originalSender"
         val bodyText = "From: $originalSender\n\n$body"
         return GmailProvider.sendEmail(context, destination, subject, bodyText)
     }
