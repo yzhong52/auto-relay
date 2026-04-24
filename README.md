@@ -45,7 +45,7 @@ Open & build the project in Android Studio, or use the command line:
 adb logcat -s AutoRelay
 ```
 
-For Gmail email forwarding setup, see [Configuring Gmail Email Forwarding](faq/configuring-gmail-email-forwarding.md).
+For Gmail email forwarding setup, see [Configuring Gmail Email Forwarding](docs/faq/configuring-gmail-email-forwarding.md).
 
 ## Get the App
 

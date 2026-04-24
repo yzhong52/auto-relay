@@ -1,4 +1,5 @@
 ---
+layout: page
 title: Why can't Auto Relay forward all RCS messages?
 ---
 

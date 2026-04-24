@@ -1,4 +1,7 @@
-# Why does Auto Relay use two message paths instead of one?
+---
+layout: page
+title: Why does Auto Relay use two message paths instead of one?
+---
 
 Android does not provide a single API that covers both SMS and RCS, so the app has to handle each through a different mechanism.
 

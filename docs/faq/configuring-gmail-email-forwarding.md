@@ -1,4 +1,7 @@
-# Configuring Gmail Email Forwarding
+---
+layout: page
+title: Configuring Gmail Email Forwarding
+---
 
 Email forwarding allows the app to send your messages to your inbox.
 

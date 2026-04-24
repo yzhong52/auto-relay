@@ -1,4 +1,7 @@
-# Do I need to keep the app open for relaying to work?
+---
+layout: page
+title: Do I need to keep the app open for relaying to work?
+---
 
 No. Once permissions are granted and forwarding is configured, the app works entirely in the background.
 
