@@ -18,7 +18,8 @@ object RelayEngine {
     private const val DEDUP_WINDOW_MS = 30_000L
     private val NOISE_PATTERNS = listOf(
         "sensitive notification content hidden",
-        "messages is doing work in the background"
+        "messages is doing work in the background",
+        "Your messages are available on the device you've paired"
     )
     private val recentBodyHashes = mutableListOf<Pair<Int, Long>>()
 

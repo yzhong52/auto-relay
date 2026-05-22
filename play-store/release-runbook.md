@@ -67,8 +67,8 @@ git push origin main --tags
 
 ## Troubleshooting
 
-| Symptom | Fix |
-|---|---|
-| `validateSigningRelease` fails | Check `keystore.properties` path and passwords |
-| Upload rejected: version code already exists | Increment `versionCode` |
-| Upload rejected: artifact not signed | Ensure `keystore.properties` exists before building |
+| Symptom                                      | Fix                                                 |
+|----------------------------------------------|-----------------------------------------------------|
+| `validateSigningRelease` fails               | Check `keystore.properties` path and passwords      |
+| Upload rejected: version code already exists | Increment `versionCode`                             |
+| Upload rejected: artifact not signed         | Ensure `keystore.properties` exists before building |
