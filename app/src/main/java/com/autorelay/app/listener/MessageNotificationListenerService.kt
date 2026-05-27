@@ -13,6 +13,11 @@ class MessageNotificationListenerService : NotificationListenerService() {
     companion object {
         private const val TAG = "AutoRelay"
         private const val GOOGLE_MESSAGES_PACKAGE = "com.google.android.apps.messaging"
+
+        /** Notification titles that are system/housekeeping — never relay. */
+        private val BLOCKED_TITLES = setOf(
+            "Device pairing"
+        )
     }
 
     override fun onListenerConnected() {
@@ -35,6 +40,11 @@ class MessageNotificationListenerService : NotificationListenerService() {
 
         val title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()?.trim().orEmpty()
         val text = extractMessageText(extras)
+
+        if (title in BLOCKED_TITLES) {
+            Log.i(TAG, "Skipping notification — blocked title: \"$title\"")
+            return
+        }
 
         if (text.isBlank()) {
             return
