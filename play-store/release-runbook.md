@@ -38,19 +38,20 @@ Enable the Google Play Android Developer API for your GCP project:
 
 ### 0c. Grant Play Console access
 
-1. Open **Play Console → Users and permissions → Invite new user**.
+1. Open [Play Console → Users and permissions][users-and-permissions]
+   → **Invite new user**.
 2. Enter the service account email
    (`auto-relay-ci@auto-relay-app.iam.gserviceaccount.com`).
-3. Under **Releases**, enable all three permissions:
-   - Release to production, exclude devices, and use Play App Signing
-   - Release apps to testing tracks
-   - Manage testing tracks and edit tester lists
+3. Set the role to **Admin** (or grant individual release permissions
+   if you prefer least-privilege).
 4. Click **Invite user**.
+
+[users-and-permissions]: https://play.google.com/console/u/0/developers/7997753858659725413/users-and-permissions
 
 ### 0d. Install Python dependencies (once)
 
 ```sh
-pip3 install google-api-python-client google-auth
+pip3 install google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib
 ```
 
 ---
@@ -89,16 +90,15 @@ but the bundle will be **unsigned** and cannot be uploaded.
 
 ## 3. Upload to Play Console
 
-### 3a. Automated upload (TODO — not yet working)
-
-The script `play-store/upload.py` is intended to automate this step:
+### 3a. Automated upload
 
 ```sh
 python3 play-store/upload.py \
   --notes "What's new in this release"
 ```
 
-Optional flags:
+The script uploads the AAB and saves the release as a **draft** on
+the **internal** track. Optional flags:
 
 | Flag | Default | Description |
 |------|---------|-------------|
@@ -107,13 +107,10 @@ Optional flags:
 | `--track` | `internal` | `internal` / `alpha` / `beta` / `production` |
 | `--notes` | _(none)_ | What's new text (en-US) |
 
-Steps 0a–0d were completed but the script returns
-`403 The caller does not have permission`. The root cause is likely
-that the GCP project is not linked to Play Console — the "API access"
-page needed to do this was not reachable in the Play Console UI.
-Further investigation required.
+After the script completes, open Play Console to **review and start
+the rollout**.
 
-### 3b. Manual upload
+### 3b. Manual upload (fallback)
 
 1. Go to **Play Console → Auto Relay → your track**.
 2. Click **Create new release**.
@@ -140,4 +137,4 @@ git push origin main --tags
 | Upload rejected: artifact not signed | Ensure `keystore.properties` exists before building |
 | `error: service account key not found` | Complete § 0a; verify key is at `../keystore/play-store-key.json` |
 | `403 … SERVICE_DISABLED` | Complete § 0b to enable the Play Developer API |
-| `403 The caller does not have permission` | GCP project may not be linked to Play Console — see TODO in § 3 |
+| `403 The caller does not have permission` | Complete § 0c; permissions may take some time to propagate after inviting the service account |
