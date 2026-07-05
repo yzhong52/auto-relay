@@ -1,6 +1,7 @@
 package com.autorelay.app.engine
 
 import android.content.Context
+import android.os.Build
 import android.telephony.PhoneNumberUtils
 import android.telephony.SmsManager
 import android.util.Log
@@ -117,8 +118,11 @@ object RelayEngine {
     }
 
     private fun forwardToEmail(context: Context, destination: String, originalSender: String, body: String): Boolean {
-        val subject = "[AutoRelay] Forwarded message from $originalSender"
+        val subject = "[AutoRelay] ($deviceName) Forwarded message from $originalSender"
         val bodyText = "From: $originalSender\n\n$body"
         return GmailProvider.sendEmail(context, destination, subject, bodyText)
     }
+
+    private val deviceName: String
+        get() = Build.MODEL ?: "Unknown device"
 }
