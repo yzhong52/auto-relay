@@ -18,6 +18,22 @@ class MessageNotificationListenerService : NotificationListenerService() {
         private val BLOCKED_TITLES = setOf(
             "Device pairing"
         )
+
+        /**
+         * Messages' own delivery-status notifications look like title "258
+         * messages not sent", text "Check your conversation with X for
+         * sending options." These aren't incoming messages, and relaying them
+         * as SMS/email can itself trigger further send failures, which
+         * re-triggers this same notification — a feedback loop. Both the
+         * title and text must match to be filtered, so a coincidental match
+         * on just one doesn't drop a real message. The ".+" between "with"
+         * and "for sending options" is the contact name — intentionally a
+         * wildcard so this matches regardless of who the contact is, rather
+         * than hardcoding one name.
+         */
+        private val SYSTEM_TITLE_PATTERN = Regex("""not sent$""", RegexOption.IGNORE_CASE)
+        private val SYSTEM_TEXT_PATTERN =
+            Regex("""^check your conversation with .+ for sending options\.?$""", RegexOption.IGNORE_CASE)
     }
 
     override fun onListenerConnected() {
@@ -47,6 +63,13 @@ class MessageNotificationListenerService : NotificationListenerService() {
         }
 
         if (text.isBlank()) {
+            return
+        }
+
+        val looksLikeDeliveryStatus = SYSTEM_TITLE_PATTERN.containsMatchIn(title) &&
+            SYSTEM_TEXT_PATTERN.matches(text)
+        if (looksLikeDeliveryStatus) {
+            Log.i(TAG, "Skipping notification — looks like a delivery-status notification: title=\"$title\" text=\"$text\"")
             return
         }
 
