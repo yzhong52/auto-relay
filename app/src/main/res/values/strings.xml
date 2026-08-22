@@ -85,4 +85,5 @@
     <string name="action_no_phone">No destination phone configured</string>
     <string name="action_sms_forwarded">SMS forwarded to %s</string>
     <string name="action_sms_failed">SMS forward failed</string>
+    <string name="action_sms_circuit_open">SMS forwarding paused after repeated failures</string>
 </resources>
